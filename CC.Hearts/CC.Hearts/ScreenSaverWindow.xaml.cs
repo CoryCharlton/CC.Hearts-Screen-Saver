@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -7,6 +9,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using CC.Hearts.Controls;
 using Cursors=System.Windows.Input.Cursors;
+using HorizontalAlignment = System.Windows.HorizontalAlignment;
 using KeyEventArgs=System.Windows.Input.KeyEventArgs;
 using MouseEventArgs=System.Windows.Input.MouseEventArgs;
 
@@ -19,8 +22,14 @@ namespace CC.Hearts
         {
             InitializeComponent();
 
+#if USEVISUAL
+            _HeartsHost.HorizontalAlignment = HorizontalAlignment.Stretch;
+            _HeartsHost.VerticalAlignment = VerticalAlignment.Stretch;
+            _CanvasMain.Children.Add(_HeartsHost);
+#else
             _Timer = new DispatcherTimer(new TimeSpan(0, 0, 0, 0, 250), DispatcherPriority.Background, TimerTick, Dispatcher);
             _Timer.Start();
+#endif
         }
 
         public ScreenSaverWindow(bool primaryScreen): this()
@@ -36,15 +45,26 @@ namespace CC.Hearts
         private int _FrameCount;
         private DateTime _FrameReset;
         private readonly bool _IsPrimary;
+
+#if USEVISUAL
+        private readonly HeartsVisualHost _HeartsHost = new HeartsVisualHost();
+#else
         private readonly DispatcherTimer _Timer;
+#endif
         #endregion
 
         #region Private Event Handlers
+        private readonly Collection<double> _FrameHistory = new Collection<double>();
+
         private void CompositionTargetRendering(object sender, EventArgs e)
         {
-            if ((DateTime.Now - _FrameReset).TotalSeconds > 1)
+            double totalSeconds = (DateTime.Now - _FrameReset).TotalSeconds;
+            if (totalSeconds > 1)
             {
-                _TextBlockFramesPerSecond.Text = "FPS: " + _FrameCount;
+                double framesPerSecond = (_FrameCount/totalSeconds);
+                _FrameHistory.Add(framesPerSecond);
+
+                _TextBlockFramesPerSecond.Text = "FPS: " + framesPerSecond.ToString("F") + " (" + (_FrameHistory.Aggregate((totalValue, nextValue) => totalValue += nextValue) / _FrameHistory.Count).ToString("F") + " " + _FrameHistory.Count + ")";
                 _FrameCount = 0;
                 _FrameReset = DateTime.Now;
             }
@@ -93,6 +113,7 @@ namespace CC.Hearts
             }
         }
 
+#if !USEVISUAL
         private void TimerTick(object sender, EventArgs e)
         {
             double actualHeight = ActualHeight;
@@ -144,9 +165,11 @@ namespace CC.Hearts
                 }
             }
         }
+#endif
         #endregion
 
         #region Private Methods
+#if !USEVISUAL
         private Heart CreateHeart(int minHeight, int maxHeight, int minWidth, int maxWidth)
         {
             Utilities.FixMinMax(ref minHeight, ref maxHeight);
@@ -164,6 +187,7 @@ namespace CC.Hearts
 
             return newHeart;
         }
+#endif
 
         private void CreateSecondaryScreenSavers()
         {
@@ -173,7 +197,6 @@ namespace CC.Hearts
                 {
                     if (screen.Primary == false)
                     {
-                        //NOTE: Jun 06 2010, 10:36P PT - Switched the project to .NET 4.0 and saw an ~10% improvement in FPS. Spread the MaximumHearts across all forms and saw a much larger improvement. Going to tweak some min/max/default values and see if I can squeeze out a little more.
                         ScreenSaverWindow secondaryScreenSaver = new ScreenSaverWindow(false)
                                                                               {
                                                                                   WindowStartupLocation = WindowStartupLocation.Manual,
