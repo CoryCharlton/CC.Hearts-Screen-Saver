@@ -169,6 +169,8 @@ namespace CC.Hearts
                 }
             }
         }
+
+        public static int Tier { get; set; }
         #endregion
 
         #region Private Methods

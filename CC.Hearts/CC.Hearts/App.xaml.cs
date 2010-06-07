@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Media;
 using CC.Utilities;
 using CC.Utilities.Interop;
 
@@ -20,6 +21,8 @@ namespace CC.Hearts
 #if DEBUG
             Settings.IsDebug = true;
 #endif
+            Settings.Tier = (RenderCapability.Tier >> 16);
+
             ArgumentParser argumentParser = new ArgumentParser(new[] { "/", "-" }, true, new[] { new Argument("c", ArgumentValue.Optional, true), new Argument("d", ArgumentValue.None, true), new Argument("p", ArgumentValue.Required, true), new Argument("s", ArgumentValue.None, true) });
             argumentParser.Parse(e.Args);
             ArgumentDictionary validArguments = argumentParser.ParsedArguments.GetValidArguments();
