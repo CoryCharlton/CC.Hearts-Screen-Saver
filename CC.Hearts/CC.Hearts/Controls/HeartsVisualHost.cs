@@ -53,6 +53,11 @@ namespace CC.Hearts.Controls
             newHeart.Top = newHeart.Height*-1;
             newHeart.Start();
 
+            // NOTE: Grasping at straws here ;-)
+            RenderOptions.SetBitmapScalingMode(newHeart, BitmapScalingMode.LowQuality);
+            RenderOptions.SetCachingHint(newHeart, CachingHint.Cache);
+            RenderOptions.SetEdgeMode(newHeart, EdgeMode.Aliased);
+
             return newHeart;
         }
 
