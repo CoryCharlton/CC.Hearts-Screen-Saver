@@ -58,9 +58,6 @@ namespace CC.Hearts.Controls
 
         private void TimerTick(object sender, EventArgs e)
         {
-            //double actualHeight = ActualHeight;
-            //double actualWidth = ActualWidth;
-
             if (Parent != null)
             {
                 double actualHeight = (double) Parent.GetValue(ActualHeightProperty);

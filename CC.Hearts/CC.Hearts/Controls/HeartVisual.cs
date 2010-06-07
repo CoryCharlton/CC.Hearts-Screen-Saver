@@ -30,9 +30,9 @@ namespace CC.Hearts.Controls
         #region Private Constants
         private const int DefaultHeight = 352;
         private const int DefaultWidth = 367;
-        public const double MaximumGravity = 8.0;
+        public const double MaximumGravity = 12.0;
         public const double MaximumRandomAngle = 35;
-        public const double MinimumGravity = 4.0;
+        public const double MinimumGravity = 6.0;
         public const double MinimumRandomAngle = 25;
         #endregion
 
@@ -176,10 +176,14 @@ namespace CC.Hearts.Controls
             {
                 LoadStreamGeometry();
             }
-            
-            DrawingContext drawingContext = RenderOpen();
-            drawingContext.DrawGeometry(_FillBrush, new Pen(_OutlineBrush, 10), _StreamGeometry);
-            drawingContext.Close();
+
+            using (DrawingContext drawingContext = RenderOpen())
+            {
+                drawingContext.DrawGeometry(_FillBrush, new Pen(_OutlineBrush, 10), _StreamGeometry);
+                //drawingContext.DrawRectangle(_FillBrush, new Pen(_OutlineBrush, 10), new Rect(0, 0, Width, Height));
+                //drawingContext.DrawEllipse(_FillBrush, new Pen(_OutlineBrush, 10), new Point(Width / 2, Height / 2), Width, Height);
+                //drawingContext.Close();
+            }
         }
 
         private static void LoadStreamGeometry()
@@ -200,18 +204,48 @@ namespace CC.Hearts.Controls
             MaximumAngle = (randomAngleDelta*gravityFactor) + MinimumRandomAngle;
             NegativeXVelocity = (Utilities.RandomNext(0, 2) == 1);
             Opacity = 0.9;
-            XVelocityRatio = Utilities.RandomNext(25, 75)/100.0;
+            XVelocityRatio = Utilities.RandomNext(25, 50)/100.0;
         }
         #endregion
 
         #region Public Methods
+        //public bool IsReallyVisible(double height, double width)
+        //{
+        //    if (Left < Width * -1)
+        //    {
+        //        return false;
+        //    }
+
+        //    if (Left > width)
+        //    {
+        //        return false;
+        //    }
+
+        //    if (Opacity < 0)
+        //    {
+        //        return false;
+        //    }
+
+        //    if (Top < Height * -1)
+        //    {
+        //        return false;
+        //    }
+
+        //    if (Top > height)
+        //    {
+        //        return false;
+        //    }
+
+        //    return true;
+        //}
+
         public bool IsReallyVisible(double height, double width)
         {
             bool returnValue = true;
 
             if (Left < Width * -1)
             {
-                returnValue = false;    
+                returnValue = false;
             }
 
             if (Left > width)
@@ -237,58 +271,60 @@ namespace CC.Hearts.Controls
             return returnValue;
         }
 
+
         public void Start()
         {
-            DoubleAnimation rotationAnimation = new DoubleAnimation
-                                                    {
-                                                        AutoReverse = true,
-                                                        Duration = new Duration(TimeSpan.FromMilliseconds((MaximumGravity - Gravity + MinimumGravity) * 250)),
-                                                        From = NegativeXVelocity ? _MaximumAngle : _MinimumAngle, 
-                                                        RepeatBehavior = RepeatBehavior.Forever,
-                                                        To = NegativeXVelocity ? _MinimumAngle : _MaximumAngle, 
-                                                    };
+            const int baseMilliseconds = 250;
+            TimeSpan baseTimeSpan = TimeSpan.FromMilliseconds(baseMilliseconds);
+            Duration baseDuration = new Duration(baseTimeSpan);
 
-            _Rotation.BeginAnimation(RotateTransform.AngleProperty, rotationAnimation);
+            DoubleAnimation leftAnimation = new DoubleAnimation
+                                                {
+                                                    AutoReverse = false,
+                                                    By = NegativeXVelocity ? Gravity*XVelocityRatio*-1 : Gravity*XVelocityRatio,
+                                                    Duration = baseDuration,
+                                                    IsAdditive = true,
+                                                    IsCumulative = true,
+                                                    RepeatBehavior = RepeatBehavior.Forever
+                                                };
 
-
+            _Translation.BeginAnimation(TranslateTransform.XProperty, leftAnimation); 
+            
             DoubleAnimation topAnimation = new DoubleAnimation
                                                {
-                                                   AutoReverse = false, 
-                                                   By = Gravity, 
-                                                   Duration = new Duration(TimeSpan.FromMilliseconds(50)), 
-                                                   From = Opacity, 
-                                                   IsAdditive = true, 
+                                                   AutoReverse = false,
+                                                   By = Gravity,
+                                                   Duration = baseDuration,
+                                                   IsAdditive = true,
                                                    IsCumulative = true,
                                                    RepeatBehavior = RepeatBehavior.Forever
                                                };
 
             _Translation.BeginAnimation(TranslateTransform.YProperty, topAnimation);
 
-            DoubleAnimation leftAnimation = new DoubleAnimation
-                                               {
-                                                   AutoReverse = false,
-                                                   By = NegativeXVelocity ? Gravity * XVelocityRatio * -1 : Gravity * XVelocityRatio,
-                                                   Duration = new Duration(TimeSpan.FromMilliseconds(50)),
-                                                   From = Left,
-                                                   IsAdditive = true,
-                                                   IsCumulative = true,
-                                                   RepeatBehavior = RepeatBehavior.Forever
-                                               };
-
-            _Translation.BeginAnimation(TranslateTransform.XProperty, leftAnimation);
-
             DoubleAnimation opacityAnimation = new DoubleAnimation
-                                                {
-                                                    AutoReverse = false,
-                                                    By = (Gravity/1000) * -1,
-                                                    Duration = new Duration(TimeSpan.FromMilliseconds(50)),
-                                                    From = Opacity,
-                                                    IsCumulative = true,
-                                                    RepeatBehavior = RepeatBehavior.Forever
-                                                };
+                                                   {
+                                                       AutoReverse = false,
+                                                       By = (Gravity/1250)*-1,
+                                                       Duration = baseDuration,
+                                                       From = Opacity,
+                                                       IsCumulative = true,
+                                                       RepeatBehavior = RepeatBehavior.Forever
+                                                   };
 
             _FillBrush.BeginAnimation(Brush.OpacityProperty, opacityAnimation);
             _OutlineBrush.BeginAnimation(Brush.OpacityProperty, opacityAnimation);
+
+            DoubleAnimation rotationAnimation = new DoubleAnimation
+                                                    {
+                                                        AutoReverse = true,
+                                                        Duration = new Duration(TimeSpan.FromMilliseconds((MaximumGravity - Gravity + MinimumGravity)* baseMilliseconds)),
+                                                        From = NegativeXVelocity ? _MaximumAngle : _MinimumAngle,
+                                                        RepeatBehavior = RepeatBehavior.Forever,
+                                                        To = NegativeXVelocity ? _MinimumAngle : _MaximumAngle,
+                                                    };
+
+            _Rotation.BeginAnimation(RotateTransform.AngleProperty, rotationAnimation);
         }
         #endregion
     }

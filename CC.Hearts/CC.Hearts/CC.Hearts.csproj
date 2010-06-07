@@ -155,7 +155,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="Controls\Heart.xaml.cs">
       <DependentUpon>Heart.xaml</DependentUpon>
     </Compile>
