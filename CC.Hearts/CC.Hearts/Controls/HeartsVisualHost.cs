@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace CC.Hearts.Controls
@@ -16,7 +17,6 @@ namespace CC.Hearts.Controls
         {
             _Timer = new DispatcherTimer(new TimeSpan(0, 0, 0, 0, 250), DispatcherPriority.Background, TimerTick, Dispatcher);
             _VisualChildren = new VisualCollection(this);
-            _Timer.Start(); // TODO: Move this so you have to explicitly start the process...
         }
         #endregion
 
@@ -31,6 +31,11 @@ namespace CC.Hearts.Controls
             get { return _VisualChildren.Count; }
         }
         #endregion
+
+        public VisualCollection VisualChildren
+        {
+            get { return _VisualChildren; }
+        }
 
         #region Private Methods
         private HeartVisual CreateHeart(int minHeight, int maxHeight, int minWidth, int maxWidth)
@@ -56,52 +61,55 @@ namespace CC.Hearts.Controls
             //double actualHeight = ActualHeight;
             //double actualWidth = ActualWidth;
 
-            double actualHeight = (double)Parent.GetValue(ActualHeightProperty);
-            double actualWidth = (double)Parent.GetValue(ActualWidthProperty);
-
-            for (int i = _VisualChildren.Count - 1; i >= 0; i--)
+            if (Parent != null)
             {
-                HeartVisual currentHeart = _VisualChildren[i] as HeartVisual;
-                
-                if (currentHeart != null)
+                double actualHeight = (double) Parent.GetValue(ActualHeightProperty);
+                double actualWidth = (double) Parent.GetValue(ActualWidthProperty);
+
+                for (int i = _VisualChildren.Count - 1; i >= 0; i--)
                 {
-                    if (!currentHeart.IsReallyVisible(actualHeight, actualWidth))
+                    HeartVisual currentHeart = _VisualChildren[i] as HeartVisual;
+
+                    if (currentHeart != null)
+                    {
+                        if (!currentHeart.IsReallyVisible(actualHeight, actualWidth))
+                        {
+                            _VisualChildren.RemoveAt(i);
+
+                            Settings.DecreaseHeartCount();
+                        }
+                    }
+                    else
                     {
                         _VisualChildren.RemoveAt(i);
-
-                        Settings.DecreaseHeartCount();
                     }
                 }
-                else
+
+                int currentCount = Settings.HeartCount;
+
+                if (currentCount < Settings.MaximumHearts)
                 {
-                    _VisualChildren.RemoveAt(i);
-                }
-            }
+                    int maxHearts = ((Settings.MaximumHearts - currentCount)/10) + 1;
 
-            int currentCount = Settings.HeartCount;
+                    if (maxHearts == 1)
+                    {
+                        maxHearts = 2;
+                    }
 
-            if (currentCount < Settings.MaximumHearts)
-            {
-                int maxHearts = ((Settings.MaximumHearts - currentCount) / 10) + 1;
+                    int minHeight = (int) (actualHeight*(Settings.Scale/150.0));
+                    int maxHeight = minHeight*2;
 
-                if (maxHearts == 1)
-                {
-                    maxHearts = 2;
-                }
+                    int minWidth = (int) (actualWidth*(Settings.Scale/150.0));
+                    int maxWidth = minWidth*2;
 
-                int minHeight = (int)(actualHeight * (Settings.Scale / 150.0));
-                int maxHeight = minHeight * 2;
+                    int heartsToCreate = Utilities.RandomNext(1, maxHearts);
 
-                int minWidth = (int)(actualWidth * (Settings.Scale / 150.0));
-                int maxWidth = minWidth * 2;
+                    for (int i = 0; i < heartsToCreate; i++)
+                    {
+                        _VisualChildren.Add(CreateHeart(minHeight, maxHeight, minWidth, maxWidth));
 
-                int heartsToCreate = Utilities.RandomNext(1, maxHearts);
-
-                for (int i = 0; i < heartsToCreate; i++)
-                {
-                    _VisualChildren.Add(CreateHeart(minHeight, maxHeight, minWidth, maxWidth));
-
-                    Settings.IncreaseHeartCount();
+                        Settings.IncreaseHeartCount();
+                    }
                 }
             }
         }
@@ -117,9 +125,28 @@ namespace CC.Hearts.Controls
 
             return _VisualChildren[index];
         }
+
+        protected override void OnRender(DrawingContext drawingContext)
+        {
+            foreach (Visual visualChild in _VisualChildren)
+            {
+                HeartVisual heartVisual = visualChild as HeartVisual;
+
+                if (heartVisual != null)
+                {
+                    RenderTargetBitmap bmp = new RenderTargetBitmap((int)heartVisual.Width, (int)heartVisual.Height, 120, 96, PixelFormats.Pbgra32);
+                    bmp.Render(heartVisual);
+                    drawingContext.DrawImage(bmp, new Rect(0,0, heartVisual.Width, heartVisual.Height));
+                }
+            }
+        }
         #endregion
 
         #region Public Methods
+        public void Start()
+        {
+            _Timer.Start();
+        }
         #endregion
     }
 }

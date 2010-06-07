@@ -176,7 +176,7 @@ namespace CC.Hearts.Controls
             {
                 LoadStreamGeometry();
             }
-
+            
             DrawingContext drawingContext = RenderOpen();
             drawingContext.DrawGeometry(_FillBrush, new Pen(_OutlineBrush, 10), _StreamGeometry);
             drawingContext.Close();
@@ -291,6 +291,5 @@ namespace CC.Hearts.Controls
             _OutlineBrush.BeginAnimation(Brush.OpacityProperty, opacityAnimation);
         }
         #endregion
-
     }
 }

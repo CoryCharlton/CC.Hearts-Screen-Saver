@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using CC.Hearts.Controls;
+using Application = System.Windows.Application;
 using Cursors=System.Windows.Input.Cursors;
 using HorizontalAlignment = System.Windows.HorizontalAlignment;
 using KeyEventArgs=System.Windows.Input.KeyEventArgs;
@@ -23,9 +24,11 @@ namespace CC.Hearts
             InitializeComponent();
 
 #if USEVISUAL
+            // NOTE: Comment out these lines to play with Class1
             _HeartsHost.HorizontalAlignment = HorizontalAlignment.Stretch;
             _HeartsHost.VerticalAlignment = VerticalAlignment.Stretch;
             _CanvasMain.Children.Add(_HeartsHost);
+            _HeartsHost.Start();
 #else
             _Timer = new DispatcherTimer(new TimeSpan(0, 0, 0, 0, 250), DispatcherPriority.Background, TimerTick, Dispatcher);
             _Timer.Start();
@@ -76,10 +79,10 @@ namespace CC.Hearts
             _TextBlockHeartCount.Text = "(" + Settings.HeartCount + "/" + Settings.MaximumHearts + ")";
         }
 
-        private void SecondaryScreenSaverClosed(object sender, EventArgs e)
-        {
-            Close();
-        }
+        //private void SecondaryScreenSaverClosed(object sender, EventArgs e)
+        //{
+        //    Close();
+        //}
 
         private void SettingChanged(object sender, SettingChangedEventArgs e)
         {
@@ -189,7 +192,7 @@ namespace CC.Hearts
         }
 #endif
 
-        private void CreateSecondaryScreenSavers()
+        private static void CreateSecondaryScreenSavers()
         {
             if (Screen.AllScreens.Length > 1)
             {
@@ -206,7 +209,6 @@ namespace CC.Hearts
                                                                                   Height = screen.WorkingArea.Height,
                                                                               };
 
-                        secondaryScreenSaver.Closed += SecondaryScreenSaverClosed;
                         secondaryScreenSaver.Show();
                         secondaryScreenSaver.WindowState = WindowState.Maximized;
                     }
@@ -256,7 +258,7 @@ namespace CC.Hearts
             {
                 if (!Settings.IsDebug || e.Key == Key.Escape)
                 {
-                    Close();
+                    Application.Current.Shutdown();
                 }
                 else if (e.KeyboardDevice.Modifiers == ModifierKeys.Alt && e.KeyboardDevice.IsKeyDown(Key.O))
                 {
@@ -281,7 +283,7 @@ namespace CC.Hearts
 
                 if (Point.Subtract(_FirstMousePosition, currentPosition).Length > 20)
                 {
-                    Close();
+                    Application.Current.Shutdown();
                 }
             }
 
