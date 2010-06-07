@@ -1,13 +1,20 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Windows;
-using System.Windows.Forms;
+using System.Windows.Interop;
 using CC.Utilities;
+using CC.Utilities.Interop;
 
 namespace CC.Hearts
 {
-    public partial class App 
+    public partial class App
     {
+        #region Private Fields
+        private HwndSource _HwndSource;  
+        private ScreenSaverWindow _ScreenSaverWindow;
+        #endregion
+
+        #region Private Event Handlers
         private void Application_Startup(object sender, StartupEventArgs e)
         {
 #if DEBUG
@@ -30,43 +37,54 @@ namespace CC.Hearts
             }
             else
             {
-                IntPtr previewHandle = IntPtr.Zero;
+                Settings.PreviewHandle = IntPtr.Zero;
 
                 if (validArguments.Contains("p"))
                 {
                     long tempLong;
                     if (long.TryParse(validArguments["p"].Value, out tempLong))
                     {
-                        previewHandle = new IntPtr(tempLong);
-                        Logging.LogMessage("Preview Handle: " + previewHandle);
+                        Settings.PreviewHandle = new IntPtr(tempLong);
                     }
                 }
 
-                if (previewHandle != IntPtr.Zero)
+                _ScreenSaverWindow = new ScreenSaverWindow(true);
+
+                if (Settings.IsPreview)
                 {
-                    MainWindow windowMain = new MainWindow(previewHandle);
-                    windowMain.Show();
+                    RECT parentRectangle = new RECT();
+                    User32.GetClientRect(Settings.PreviewHandle, parentRectangle);
+
+                    HwndSourceParameters hwndSourceParameters = new HwndSourceParameters
+                                                                    {
+                                                                        Height = parentRectangle.bottom - parentRectangle.top,
+                                                                        Width = parentRectangle.right - parentRectangle.left,
+                                                                        ParentWindow = Settings.PreviewHandle,
+                                                                        PositionX = 0,
+                                                                        PositionY = 0,
+                                                                        WindowStyle = (int) (WS.VISIBLE | WS.CHILD | WS.CLIPCHILDREN)
+                                                                    };
+
+                    _ScreenSaverWindow.Height = hwndSourceParameters.Height;
+                    _ScreenSaverWindow.Width = hwndSourceParameters.Width;
+                    _ScreenSaverWindow.Visibility = Visibility.Hidden;
+
+                    _HwndSource = new HwndSource(hwndSourceParameters) {RootVisual = _ScreenSaverWindow._GridMain};
+                    _HwndSource.Disposed += _HwndSource_Disposed;
                 }
                 else
                 {
-                    // NOTE: Haven't tested this yet. Wondering about the CPU usage caused by multiple distinct renderings. Wondering if "mirroring" is a better option.
-                    // NOTE: The above comment is obviously premature optimization...
-                    foreach (Screen screen in Screen.AllScreens)
-                    {
-                        MainWindow windowMain = new MainWindow(screen.Primary)
-                                           {
-                                               WindowStartupLocation = WindowStartupLocation.Manual,
-                                               Left = screen.WorkingArea.Left,
-                                               Top = screen.WorkingArea.Top,
-                                               Width = screen.WorkingArea.Width,
-                                               Height = screen.WorkingArea.Height,
-                                           };
-
-                        windowMain.Show();
-                        windowMain.WindowState = WindowState.Maximized;
-                    }
+                    _ScreenSaverWindow.Show();
                 }
             }
         }
+
+        // ReSharper disable InconsistentNaming
+        private void _HwndSource_Disposed(object sender, EventArgs e)
+        // ReSharper restore InconsistentNaming
+        {
+            _ScreenSaverWindow.Close();
+        }
+        #endregion
     }
 }

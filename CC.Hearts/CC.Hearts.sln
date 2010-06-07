@@ -10,15 +10,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{
 		Libraries\CC.Utilities.xml = Libraries\CC.Utilities.xml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CC.Hearts.TestTool", "CC.Hearts.TestTool\CC.Hearts.TestTool.csproj", "{3D777364-7302-40C4-A215-71D87A81E9A8}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 2
+		SccNumberOfProjects = 3
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs01.codeplex.com/
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = CC.Hearts\\CC.Hearts.csproj
 		SccProjectName1 = CC.Hearts
 		SccLocalPath1 = CC.Hearts
+		SccProjectUniqueName2 = CC.Hearts.TestTool\\CC.Hearts.TestTool.csproj
+		SccProjectName2 = CC.Hearts.TestTool
+		SccLocalPath2 = CC.Hearts.TestTool
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +34,10 @@ Global
 		{7F5B7A79-0D46-4991-827F-92F8DDE02F6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F5B7A79-0D46-4991-827F-92F8DDE02F6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F5B7A79-0D46-4991-827F-92F8DDE02F6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D777364-7302-40C4-A215-71D87A81E9A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D777364-7302-40C4-A215-71D87A81E9A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D777364-7302-40C4-A215-71D87A81E9A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D777364-7302-40C4-A215-71D87A81E9A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

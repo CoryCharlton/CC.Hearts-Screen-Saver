@@ -75,6 +75,11 @@ namespace CC.Hearts
 
         public static bool IsDebug { get; set; }
 
+        public static bool IsPreview
+        {
+            get { return PreviewHandle != IntPtr.Zero; }
+        }
+
         public static int MaximumHearts
         {
             get { return _MaximumHearts; }
@@ -94,6 +99,8 @@ namespace CC.Hearts
                 }
             }
         }
+
+        public static IntPtr PreviewHandle { get; set; }
 
         public static int Scale
         {

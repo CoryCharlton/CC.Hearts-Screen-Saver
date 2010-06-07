@@ -1,5 +1,8 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace CC.Hearts
 {
@@ -9,6 +12,9 @@ namespace CC.Hearts
         public OptionsWindow()
         {
             InitializeComponent();
+
+            Icon = BitmapFrame.Create(new Uri("pack://application:,,,/Resources/Heart.ico", UriKind.RelativeOrAbsolute));
+
             SettingsToWindow();
             SetToolTips();
             UpdateApplyButton();
