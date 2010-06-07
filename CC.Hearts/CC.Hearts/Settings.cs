@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using CC.Utilities;
 using Microsoft.Win32;
 
@@ -18,14 +19,16 @@ namespace CC.Hearts
         // ReSharper disable InconsistentNaming
         #region Default Values
         private const int DEFAULT_FRAMES_PER_SECOND = 45;
-        private const int DEFAULT_MAXIMUM_HEARTS = 55;
+        private const int DEFAULT_MAXIMUM_HEARTS = 30;
         private const int DEFAULT_SCALE = 10;
+        private const bool DEFAULT_SHOW_STATUS = false;
         #endregion
 
         #region Registry Keys
         private const string FRAMES_PER_SECOND = "FramesPerSecond";
         private const string MAXIMUM_HEARTS = "MaximumHearts";
         private const string SCALE = "Scale";
+        private const string SHOW_STATUS = "ShowStatus";
 
         private const string REGISTRY_KEY = @"Software\CC.Hearts Screensaver";
         #endregion
@@ -34,7 +37,7 @@ namespace CC.Hearts
         #region Public Constants
         #region Maximum Values
         public const int MAXIMUM_FRAMES_PER_SECOND = 60;
-        public const int MAXIMUM_MAXIMUM_HEARTS = 100;
+        public const int MAXIMUM_MAXIMUM_HEARTS = 50;
         public const int MAXIMUM_SCALE = 15;
         #endregion
 
@@ -48,8 +51,15 @@ namespace CC.Hearts
 
         #region Private Fields
         private static int _FramesPerSecond;
+        private static int _HeartCount;
+        private static bool _IsLoaded;
         private static int _MaximumHearts;
         private static int _Scale;
+        private static bool _ShowStatus;
+        #endregion
+
+        #region Public Events
+        public static EventHandler<SettingChangedEventArgs> SettingChanged;
         #endregion
 
         #region Public Properties
@@ -58,18 +68,32 @@ namespace CC.Hearts
             get { return _FramesPerSecond; }
             set
             {
+                int targetValue = value;
+
                 if (value > MAXIMUM_FRAMES_PER_SECOND)
                 {
-                    _FramesPerSecond = MAXIMUM_FRAMES_PER_SECOND;
+                    targetValue = MAXIMUM_FRAMES_PER_SECOND;
                 }
                 else if (value < MINIMUM_FRAMES_PER_SECOND)
                 {
-                    _FramesPerSecond = MINIMUM_FRAMES_PER_SECOND;
+                    targetValue = MINIMUM_FRAMES_PER_SECOND;
                 }
-                else
+
+                if (targetValue != _FramesPerSecond)
                 {
-                    _FramesPerSecond = value;
+                    _FramesPerSecond = targetValue;
+
+                    OnSettingChanged(CreateSettingChangedEventArgs(Setting.FramesPerSecond));
                 }
+            }
+        }
+
+        public static int HeartCount
+        {
+            get { return _HeartCount; }
+            set
+            {
+                Interlocked.Exchange(ref _HeartCount, value);
             }
         }
 
@@ -85,17 +109,22 @@ namespace CC.Hearts
             get { return _MaximumHearts; }
             set
             {
+                int targetValue = value;
+
                 if (value > MAXIMUM_MAXIMUM_HEARTS)
                 {
-                    _MaximumHearts = MAXIMUM_MAXIMUM_HEARTS;
+                    targetValue = MAXIMUM_MAXIMUM_HEARTS;
                 }
                 else if (value < MINIMUM_MAXIMUM_HEARTS)
                 {
-                    _MaximumHearts = MINIMUM_MAXIMUM_HEARTS;
+                    targetValue = MINIMUM_MAXIMUM_HEARTS;
                 }
-                else
+
+                if (targetValue != _MaximumHearts)
                 {
-                    _MaximumHearts = value;
+                    _MaximumHearts = targetValue;
+
+                    OnSettingChanged(CreateSettingChangedEventArgs(Setting.MaximumHearts));
                 }
             }
         }
@@ -107,33 +136,79 @@ namespace CC.Hearts
             get { return _Scale; }
             set
             {
+                int targetValue = value;
+
                 if (value > MAXIMUM_SCALE)
                 {
-                    _Scale = MAXIMUM_SCALE;
+                    targetValue = MAXIMUM_SCALE;
                 }
                 else if (value < MINIMUM_SCALE)
                 {
-                    _Scale = MINIMUM_SCALE;
+                    targetValue = MINIMUM_SCALE;
                 }
-                else
+
+                if (targetValue != _Scale)
                 {
-                    _Scale = value;
+                    _Scale = targetValue;
+
+                    OnSettingChanged(CreateSettingChangedEventArgs(Setting.Scale));
+                }
+            }
+        }
+
+        public static bool ShowStatus
+        {
+            get { return _ShowStatus; }
+            set
+            {
+                if (_ShowStatus != value)
+                {
+                    _ShowStatus = value;
+
+                    OnSettingChanged(CreateSettingChangedEventArgs(Setting.ShowStatus));
                 }
             }
         }
         #endregion
 
         #region Private Methods
+        private static SettingChangedEventArgs CreateSettingChangedEventArgs(Setting setting)
+        {
+            return new SettingChangedEventArgs(setting, !_IsLoaded);            
+        }
+
         private static RegistryKey OpenRegistryKey()
         {
             return (Registry.LocalMachine.CreateSubKey(REGISTRY_KEY));
         }
+
+        private static void OnSettingChanged(SettingChangedEventArgs eventArgs)
+        {
+            if (SettingChanged != null)
+            {
+                SettingChanged(null, eventArgs);
+            }
+        }
         #endregion
 
         #region Public Methods
+        public static void DecreaseHeartCount()
+        {
+            int currentCount = Interlocked.Decrement(ref _HeartCount);
+            if (currentCount < 0)
+            {
+                Interlocked.Exchange(ref _HeartCount, 0);
+            }
+        }
+
+        public static void IncreaseHeartCount()
+        {
+            Interlocked.Increment(ref _HeartCount);
+        }
+
         public static bool Load()
         {
-            bool returnValue;
+            _IsLoaded = false;
 
             try
             {
@@ -142,24 +217,26 @@ namespace CC.Hearts
                     FramesPerSecond = (int)registryKey.GetValue(FRAMES_PER_SECOND, DEFAULT_FRAMES_PER_SECOND);
                     MaximumHearts = (int)registryKey.GetValue(MAXIMUM_HEARTS, DEFAULT_MAXIMUM_HEARTS);
                     Scale = (int)registryKey.GetValue(SCALE, DEFAULT_SCALE);
-                    
-                    //RandomVerse = bool.Parse(registryKey.GetValue(RANDOM_VERSE, _DefaultRandomVerse).ToString());
+                    ShowStatus = bool.Parse(registryKey.GetValue(SHOW_STATUS, DEFAULT_SHOW_STATUS).ToString());
                 }
 
-                returnValue = true;
+                _IsLoaded = true;
             }
             catch (Exception e)
             {
                 Logging.LogException(e);
-                returnValue = false;
+                _IsLoaded = false;
             }
 
-            return returnValue;
+            return _IsLoaded;
         }
 
         public static void Reset()
         {
             FramesPerSecond = DEFAULT_FRAMES_PER_SECOND;
+            MaximumHearts = DEFAULT_MAXIMUM_HEARTS;
+            Scale = DEFAULT_SCALE;
+            ShowStatus = DEFAULT_SHOW_STATUS;
         }
 
         public static bool Save()
@@ -173,8 +250,7 @@ namespace CC.Hearts
                     registryKey.SetValue(FRAMES_PER_SECOND, FramesPerSecond, RegistryValueKind.DWord);
                     registryKey.SetValue(MAXIMUM_HEARTS, MaximumHearts, RegistryValueKind.DWord);
                     registryKey.SetValue(SCALE, Scale, RegistryValueKind.DWord);
-
-                    //registryKey.SetValue(RANDOM_VERSE, RandomVerse.ToString(), RegistryValueKind.String);
+                    registryKey.SetValue(SHOW_STATUS, ShowStatus.ToString(), RegistryValueKind.String);
                     
                     registryKey.Close();
                 }      

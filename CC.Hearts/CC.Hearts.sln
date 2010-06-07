@@ -1,8 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CC.Hearts", "CC.Hearts\CC.Hearts.csproj", "{7F5B7A79-0D46-4991-827F-92F8DDE02F6D}"
-EndProject
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{708582C6-C58F-4973-8669-EBDD6A9BEA44}"
 	ProjectSection(SolutionItems) = preProject
 		Libraries\CC.Utilities.dll = Libraries\CC.Utilities.dll
@@ -10,11 +8,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{
 		Libraries\CC.Utilities.xml = Libraries\CC.Utilities.xml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CC.Hearts", "CC.Hearts\CC.Hearts.csproj", "{7F5B7A79-0D46-4991-827F-92F8DDE02F6D}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CC.Hearts.TestTool", "CC.Hearts.TestTool\CC.Hearts.TestTool.csproj", "{3D777364-7302-40C4-A215-71D87A81E9A8}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "CC.Hearts.Installer", "CC.Hearts.Installer\CC.Hearts.Installer.vdproj", "{A008D09B-F928-4EFA-A7FE-5E87E26796D3}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 3
+		SccNumberOfProjects = 4
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs01.codeplex.com/
 		SccLocalPath0 = .
@@ -24,6 +26,9 @@ Global
 		SccProjectUniqueName2 = CC.Hearts.TestTool\\CC.Hearts.TestTool.csproj
 		SccProjectName2 = CC.Hearts.TestTool
 		SccLocalPath2 = CC.Hearts.TestTool
+		SccProjectUniqueName3 = CC.Hearts.Installer\\CC.Hearts.Installer.vdproj
+		SccProjectName3 = CC.Hearts.Installer
+		SccLocalPath3 = CC.Hearts.Installer
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +43,8 @@ Global
 		{3D777364-7302-40C4-A215-71D87A81E9A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D777364-7302-40C4-A215-71D87A81E9A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D777364-7302-40C4-A215-71D87A81E9A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A008D09B-F928-4EFA-A7FE-5E87E26796D3}.Debug|Any CPU.ActiveCfg = Debug
+		{A008D09B-F928-4EFA-A7FE-5E87E26796D3}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

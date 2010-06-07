@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace CC.Hearts
@@ -46,16 +45,23 @@ namespace CC.Hearts
 
         private void _ButtonDefaults_Click(object sender, RoutedEventArgs e)
         {
-            //TODO: Probably want to prompt the user...
-            Settings.Reset();
-            SettingsToWindow();
-            Save();
+            if (MessageBoxResult.Yes == MessageBox.Show("Are you sure you want to reset all settings to their default values?", System.Windows.Forms.Application.ProductName, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No))
+            {
+                Settings.Reset();
+                SettingsToWindow();
+                Save();
+            }
         }
 
         private void _ButtonOk_Click(object sender, RoutedEventArgs e)
         {
             Save();
             Close();
+        }
+
+        private void _CheckBoxShowStatus_Checked(object sender, RoutedEventArgs e)
+        {
+            UpdateApplyButton();
         }
 
         private void _SliderFramesPerSecond_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -94,6 +100,11 @@ namespace CC.Hearts
         {
             bool returnValue = false;
 
+            if (_CheckBoxShowStatus != null && _CheckBoxShowStatus.IsChecked.GetValueOrDefault() != Settings.ShowStatus)
+            {
+                returnValue = true;
+            }
+
             if (_SliderFramesPerSecond != null && (int)_SliderFramesPerSecond.Value != Settings.FramesPerSecond)
             {
                 returnValue = true;
@@ -121,6 +132,7 @@ namespace CC.Hearts
 
         private void SettingsToWindow()
         {
+            _CheckBoxShowStatus.IsChecked = Settings.ShowStatus;
             _SliderFramesPerSecond.Value = Settings.FramesPerSecond;
             _SliderMaximumHearts.Value = Settings.MaximumHearts;
             _SliderScale.Value = Settings.Scale;
@@ -156,6 +168,7 @@ namespace CC.Hearts
             Settings.FramesPerSecond = (int)_SliderFramesPerSecond.Value;
             Settings.MaximumHearts = (int)_SliderMaximumHearts.Value;
             Settings.Scale = (int)_SliderScale.Value;
+            Settings.ShowStatus = _CheckBoxShowStatus.IsChecked.GetValueOrDefault();
         }
         #endregion
     }

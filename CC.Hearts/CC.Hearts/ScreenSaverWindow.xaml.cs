@@ -19,7 +19,7 @@ namespace CC.Hearts
         {
             InitializeComponent();
 
-            _Timer = new DispatcherTimer(new TimeSpan(0, 0, 0, 0, 100), DispatcherPriority.Background, TimerTick, Dispatcher);
+            _Timer = new DispatcherTimer(new TimeSpan(0, 0, 0, 0, 250), DispatcherPriority.Background, TimerTick, Dispatcher);
             _Timer.Start();
         }
 
@@ -52,11 +52,45 @@ namespace CC.Hearts
             {
                 _FrameCount++;                
             }
+
+            _TextBlockHeartCount.Text = "(" + Settings.HeartCount + "/" + Settings.MaximumHearts + ")";
         }
 
         private void SecondaryScreenSaverClosed(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void SettingChanged(object sender, SettingChangedEventArgs e)
+        {
+            if (!e.IsLoadEvent)
+            {
+                switch (e.Setting)
+                {
+                    case Setting.FramesPerSecond:
+                        {
+                            //TODO: How can I undo this? From the documentation it looks like I can't since it's already in use...
+                            //Timeline.DesiredFrameRateProperty.OverrideMetadata(typeof(Timeline), new FrameworkPropertyMetadata { DefaultValue = Settings.FramesPerSecond });
+                            break;
+                        }
+                    case Setting.ShowStatus:
+                        {
+                            if (Settings.ShowStatus)// || Settings.IsDebug)
+                            {
+                                CompositionTarget.Rendering -= CompositionTargetRendering;
+                                CompositionTarget.Rendering += CompositionTargetRendering;
+                                _RowDebug.Height = new GridLength(22);
+                            }
+                            else
+                            {
+                                CompositionTarget.Rendering -= CompositionTargetRendering;
+                                _RowDebug.Height = new GridLength(0);                                
+                            }
+
+                            break;
+                        }
+                }
+            }
         }
 
         private void TimerTick(object sender, EventArgs e)
@@ -73,6 +107,8 @@ namespace CC.Hearts
                     if (!currentHeart.IsReallyVisible(actualHeight, actualWidth))
                     {
                         _CanvasMain.Children.RemoveAt(i);
+
+                        Settings.DecreaseHeartCount();
                     }
                 }
                 else
@@ -81,11 +117,11 @@ namespace CC.Hearts
                 }
             }
 
-            int currentCount = _CanvasMain.Children.Count;
+            int currentCount = Settings.HeartCount;
 
             if (currentCount < Settings.MaximumHearts)
             {
-                int maxHearts = ((Settings.MaximumHearts - currentCount) / 20) + 1;
+                int maxHearts = ((Settings.MaximumHearts - currentCount) / 10) + 1;
 
                 if (maxHearts == 1)
                 {
@@ -103,6 +139,8 @@ namespace CC.Hearts
                 for (int i = 0; i < heartsToCreate; i++)
                 {
                     _CanvasMain.Children.Add(CreateHeart(minHeight, maxHeight, minWidth, maxWidth));
+
+                    Settings.IncreaseHeartCount();
                 }
             }
         }
@@ -135,9 +173,8 @@ namespace CC.Hearts
                 {
                     if (screen.Primary == false)
                     {
-                        //NOTE: I'm not happy with the multi-monitor performace. FPS drops by ~50% regardless if I mirror or render seperately (rendering seperately seems slightly faster)
+                        //NOTE: Jun 06 2010, 10:36P PT - Switched the project to .NET 4.0 and saw an ~10% improvement in FPS. Spread the MaximumHearts across all forms and saw a much larger improvement. Going to tweak some min/max/default values and see if I can squeeze out a little more.
                         ScreenSaverWindow secondaryScreenSaver = new ScreenSaverWindow(false)
-                        //SecondaryScreenSaverWindow secondaryScreenSaver = new SecondaryScreenSaverWindow()
                                                                               {
                                                                                   WindowStartupLocation = WindowStartupLocation.Manual,
                                                                                   Left = screen.WorkingArea.Left,
@@ -145,7 +182,7 @@ namespace CC.Hearts
                                                                                   Width = screen.WorkingArea.Width,
                                                                                   Height = screen.WorkingArea.Height,
                                                                               };
-                        //secondaryScreenSaver.SetParent(this);
+
                         secondaryScreenSaver.Closed += SecondaryScreenSaverClosed;
                         secondaryScreenSaver.Show();
                         secondaryScreenSaver.WindowState = WindowState.Maximized;
@@ -156,7 +193,7 @@ namespace CC.Hearts
 
         private void SetupScreenSaver()
         {
-            if (_IsPrimary && Settings.IsDebug)
+            if (_IsPrimary && (Settings.IsDebug || Settings.ShowStatus))
             {
                 CompositionTarget.Rendering += CompositionTargetRendering;
                 _RowDebug.Height = new GridLength(22);
@@ -174,6 +211,7 @@ namespace CC.Hearts
                 if (_IsPrimary)
                 {
                     Timeline.DesiredFrameRateProperty.OverrideMetadata(typeof(Timeline), new FrameworkPropertyMetadata { DefaultValue = Settings.FramesPerSecond });
+                    Settings.SettingChanged += SettingChanged;
 
                     Show();
                     WindowState = WindowState.Maximized;

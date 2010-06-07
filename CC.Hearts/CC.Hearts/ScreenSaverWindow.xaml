@@ -12,6 +12,14 @@
         
         </Canvas>
         
-        <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Name="_TextBlockFramesPerSecond" Opacity="0.8" Text="FPS: 0" Grid.Row="1" />
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Name="_TextBlockFramesPerSecond" Opacity="0.8" Text="FPS: 0" Grid.Column="0" />
+            <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Name="_TextBlockHeartCount" Opacity="0.8" Text="Hearts: (0/0)" Grid.Column="1" HorizontalAlignment="Right" />
+        </Grid>
     </Grid>
 </Window>
