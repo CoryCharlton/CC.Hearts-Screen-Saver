@@ -16,8 +16,10 @@ namespace CC.Hearts
         #endregion
 
         #region Private Event Handlers
-        private void Application_Startup(object sender, StartupEventArgs e)
+        protected override void OnStartup(StartupEventArgs e)
         {
+            //base.OnStartup(e);
+
 #if DEBUG
             Settings.IsDebug = true;
 #endif

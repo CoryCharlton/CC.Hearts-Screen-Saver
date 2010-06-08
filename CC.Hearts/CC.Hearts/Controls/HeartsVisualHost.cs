@@ -115,8 +115,6 @@ namespace CC.Hearts.Controls
                         _VisualChildren.Add(CreateHeart(minHeight, maxHeight, minWidth, maxWidth));
                         Settings.IncreaseHeartCount();
                     }
-
-                    InvalidateVisual();
                 }
             }
         }
@@ -131,18 +129,8 @@ namespace CC.Hearts.Controls
 
         protected override Visual GetVisualChild(int index)
         {
-            if (index < 0 || index >= _VisualChildren.Count)
-            {
-                throw new ArgumentOutOfRangeException();
-            }
-
             return _VisualChildren[index];
         }
-
-        //protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
-        //{
-        //    base.OnVisualChildrenChanged(visualAdded, visualRemoved);
-        //}
 
         // NOTE: Hoping to reduce CPU, wish I could get profiling working
         protected override void OnRender(DrawingContext dc)

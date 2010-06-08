@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -42,31 +43,31 @@ namespace CC.Hearts
         #endregion
 
         #region Private Event Handlers
-        private readonly Collection<double> _FrameHistory = new Collection<double>();
+        private readonly List<double> _FrameHistory = new List<double>();
 
         private void CompositionTargetRendering(object sender, EventArgs e)
         {
             double totalSeconds = (DateTime.Now - _FrameReset).TotalSeconds;
             if (totalSeconds > 1)
             {
-                double framesPerSecond = (_FrameCount/totalSeconds);
+                double framesPerSecond = (_FrameCount / totalSeconds);
                 _FrameHistory.Add(framesPerSecond);
 
                 while (_FrameHistory.Count > 180)
                 {
-                    _FrameHistory.RemoveAt(0);    
+                    _FrameHistory.RemoveAt(0);
                 }
 
                 _TextBlockFramesPerSecond.Text = "FPS: " + framesPerSecond.ToString("F") + " (" + (_FrameHistory.Aggregate((totalValue, nextValue) => totalValue += nextValue) / _FrameHistory.Count).ToString("F") + " " + _FrameHistory.Count + ")";
+                _TextBlockHeartCount.Text = "(" + Settings.HeartCount + "/" + Settings.MaximumHearts + ")";
+
                 _FrameCount = 0;
                 _FrameReset = DateTime.Now;
             }
             else
             {
-                _FrameCount++;                
+                _FrameCount++;
             }
-
-            _TextBlockHeartCount.Text = "(" + Settings.HeartCount + "/" + Settings.MaximumHearts + ")";
         }
 
         private void SettingChanged(object sender, SettingChangedEventArgs e)

@@ -208,67 +208,67 @@ namespace CC.Hearts.Controls
         #endregion
 
         #region Public Methods
-        //public bool IsReallyVisible(double height, double width)
-        //{
-        //    if (Left < Width * -1)
-        //    {
-        //        return false;
-        //    }
-
-        //    if (Left > width)
-        //    {
-        //        return false;
-        //    }
-
-        //    if (Opacity < 0)
-        //    {
-        //        return false;
-        //    }
-
-        //    if (Top < Height * -1)
-        //    {
-        //        return false;
-        //    }
-
-        //    if (Top > height)
-        //    {
-        //        return false;
-        //    }
-
-        //    return true;
-        //}
-
         public bool IsReallyVisible(double height, double width)
         {
-            bool returnValue = true;
-
             if (Left < Width * -1)
             {
-                returnValue = false;
+                return false;
             }
 
             if (Left > width)
             {
-                returnValue = false;
+                return false;
             }
 
             if (Opacity < 0)
             {
-                returnValue = false;
+                return false;
             }
 
             if (Top < Height * -1)
             {
-                returnValue = false;
+                return false;
             }
 
             if (Top > height)
             {
-                returnValue = false;
+                return false;
             }
 
-            return returnValue;
+            return true;
         }
+
+        //public bool IsReallyVisible(double height, double width)
+        //{
+        //    bool returnValue = true;
+
+        //    if (Left < Width * -1)
+        //    {
+        //        returnValue = false;
+        //    }
+
+        //    if (Left > width)
+        //    {
+        //        returnValue = false;
+        //    }
+
+        //    if (Opacity < 0)
+        //    {
+        //        returnValue = false;
+        //    }
+
+        //    if (Top < Height * -1)
+        //    {
+        //        returnValue = false;
+        //    }
+
+        //    if (Top > height)
+        //    {
+        //        returnValue = false;
+        //    }
+
+        //    return returnValue;
+        //}
 
 
         public void Start()

@@ -1,7 +1,6 @@
 ﻿<Application x:Class="CC.Hearts.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Startup="Application_Startup">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Application.Resources>
         <StreamGeometry x:Key="HeartGeometry">F1 M 229,161.333C 306.333,88.6667 409,142.122 409,225.333C 409,308.544 229,462.667 229,462.667C 229,462.667 057,306.544 057,223.333C 057,140.123 156.138,88.4713 229,161.333 Z</StreamGeometry>
         <BitmapImage x:Key="HeartImage" UriSource="/Resources/Heart.ico" />
