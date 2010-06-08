@@ -50,6 +50,15 @@ namespace CC.Hearts
         {
             return _Random.Next(minValue, maxValue);
         }
+
+        public static SolidColorBrush RandomSolidColorBrush()
+        {
+            int blue = RandomNext(0, 256);
+            int green = RandomNext(0, 256);
+            int red = RandomNext(0, 256);
+
+            return new SolidColorBrush(Color.FromRgb((byte)red, (byte)green, (byte)blue));
+        }
         #endregion
     }
 }

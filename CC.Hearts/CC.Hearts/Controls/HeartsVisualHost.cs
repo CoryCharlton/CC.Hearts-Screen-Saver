@@ -43,10 +43,11 @@ namespace CC.Hearts.Controls
             Utilities.FixMinMax(ref minHeight, ref maxHeight);
             Utilities.FixMinMax(ref minWidth, ref maxWidth);
 
-            HeartVisual newHeart = new HeartVisual(Utilities.RandomGradientBrush<RadialGradientBrush>(), Utilities.RandomGradientBrush<LinearGradientBrush>())
+            //HeartVisual newHeart = new HeartVisual(Utilities.RandomSolidColorBrush(), Utilities.RandomSolidColorBrush())
+            HeartVisual newHeart = new HeartVisual(Utilities.RandomGradientBrush<RadialGradientBrush>(), Utilities.RandomSolidColorBrush())
                                        {
                                            Height = Utilities.RandomNext(minHeight, maxHeight),
-                                           Left = Utilities.RandomNext(0, (int)(double)Parent.GetValue(ActualWidthProperty)),
+                                           Left = Utilities.RandomNext(0, (int) (double) Parent.GetValue(ActualWidthProperty)),
                                            Width = Utilities.RandomNext(minWidth, maxWidth),
                                        };
 
@@ -128,20 +129,20 @@ namespace CC.Hearts.Controls
             return _VisualChildren[index];
         }
 
-        protected override void OnRender(DrawingContext drawingContext)
-        {
-            foreach (Visual visualChild in _VisualChildren)
-            {
-                HeartVisual heartVisual = visualChild as HeartVisual;
+        //protected override void OnRender(DrawingContext drawingContext)
+        //{
+        //    foreach (Visual visualChild in _VisualChildren)
+        //    {
+        //        HeartVisual heartVisual = visualChild as HeartVisual;
 
-                if (heartVisual != null)
-                {
-                    RenderTargetBitmap bmp = new RenderTargetBitmap((int)heartVisual.Width, (int)heartVisual.Height, 120, 96, PixelFormats.Pbgra32);
-                    bmp.Render(heartVisual);
-                    drawingContext.DrawImage(bmp, new Rect(0,0, heartVisual.Width, heartVisual.Height));
-                }
-            }
-        }
+        //        if (heartVisual != null)
+        //        {
+        //            RenderTargetBitmap bmp = new RenderTargetBitmap((int)heartVisual.Width, (int)heartVisual.Height, 120, 96, PixelFormats.Pbgra32);
+        //            bmp.Render(heartVisual);
+        //            drawingContext.DrawImage(bmp, new Rect(0,0, heartVisual.Width, heartVisual.Height));
+        //        }
+        //    }
+        //}
         #endregion
 
         #region Public Methods

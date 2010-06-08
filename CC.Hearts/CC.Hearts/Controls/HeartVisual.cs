@@ -43,6 +43,7 @@ namespace CC.Hearts.Controls
         private double _MaximumAngle;
         private double _MinimumAngle;
         private Brush _OutlineBrush;
+        private Pen _OutlinePen;
         private RotateTransform _Rotation;
         private ScaleTransform _Scale;
         private static StreamGeometry _StreamGeometry;
@@ -124,6 +125,7 @@ namespace CC.Hearts.Controls
             set
             {
                 _OutlineBrush = value;
+                _OutlinePen.Brush = _OutlineBrush;
 
                 CreateVisual();
             }
@@ -195,6 +197,7 @@ namespace CC.Hearts.Controls
         {
             _FillBrush = Brushes.Red;
             _OutlineBrush = Brushes.Black;
+            _OutlinePen = new Pen(_OutlineBrush, 10);
 
             Gravity = Utilities.RandomNext((int) MinimumGravity, (int) (MaximumGravity + 1));
 
@@ -288,7 +291,7 @@ namespace CC.Hearts.Controls
                                                     RepeatBehavior = RepeatBehavior.Forever
                                                 };
 
-            _Translation.BeginAnimation(TranslateTransform.XProperty, leftAnimation); 
+            _Translation.BeginAnimation(TranslateTransform.XProperty, leftAnimation, HandoffBehavior.SnapshotAndReplace); 
             
             DoubleAnimation topAnimation = new DoubleAnimation
                                                {
@@ -300,7 +303,7 @@ namespace CC.Hearts.Controls
                                                    RepeatBehavior = RepeatBehavior.Forever
                                                };
 
-            _Translation.BeginAnimation(TranslateTransform.YProperty, topAnimation);
+            _Translation.BeginAnimation(TranslateTransform.YProperty, topAnimation, HandoffBehavior.SnapshotAndReplace);
 
             DoubleAnimation opacityAnimation = new DoubleAnimation
                                                    {
@@ -312,8 +315,8 @@ namespace CC.Hearts.Controls
                                                        RepeatBehavior = RepeatBehavior.Forever
                                                    };
 
-            _FillBrush.BeginAnimation(Brush.OpacityProperty, opacityAnimation);
-            _OutlineBrush.BeginAnimation(Brush.OpacityProperty, opacityAnimation);
+            _FillBrush.BeginAnimation(Brush.OpacityProperty, opacityAnimation, HandoffBehavior.SnapshotAndReplace);
+            _OutlineBrush.BeginAnimation(Brush.OpacityProperty, opacityAnimation, HandoffBehavior.SnapshotAndReplace);
 
             DoubleAnimation rotationAnimation = new DoubleAnimation
                                                     {
@@ -324,7 +327,7 @@ namespace CC.Hearts.Controls
                                                         To = NegativeXVelocity ? _MinimumAngle : _MaximumAngle,
                                                     };
 
-            _Rotation.BeginAnimation(RotateTransform.AngleProperty, rotationAnimation);
+            _Rotation.BeginAnimation(RotateTransform.AngleProperty, rotationAnimation, HandoffBehavior.SnapshotAndReplace);
         }
         #endregion
     }
