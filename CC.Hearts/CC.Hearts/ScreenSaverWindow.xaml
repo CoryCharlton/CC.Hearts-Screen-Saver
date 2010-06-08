@@ -1,16 +1,14 @@
 ﻿<Window x:Class="CC.Hearts.ScreenSaverWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:Hearts="clr-namespace:CC.Hearts" Title="CC.Hearts Screen Saver" Height="600" Width="600" Background="Black" WindowStyle="None" WindowStartupLocation="Manual" Visibility="Visible" ShowInTaskbar="False" ShowActivated="True" WindowState="Normal" ResizeMode="NoResize" Topmost="True">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:Controls="clr-namespace:CC.Hearts.Controls" Title="CC.Hearts Screen Saver" Height="600" Width="600" Background="Black" WindowStyle="None" WindowStartupLocation="Manual" Visibility="Visible" ShowInTaskbar="False" ShowActivated="True" WindowState="Normal" ResizeMode="NoResize" Topmost="True">
     <Grid Name="_GridMain">
         <Grid.RowDefinitions>
             <RowDefinition Name="_RowMain" Height="*" ></RowDefinition>
             <RowDefinition Name="_RowDebug" Height="0" ></RowDefinition>
         </Grid.RowDefinitions>
         
-        <Canvas x:Name="_CanvasMain" Height="auto" Width="auto" Grid.Row="0">
-        
-        </Canvas>
-        
+        <Controls:HeartsVisualHost x:Name="_HeartsVisualHost" Grid.Row="0"></Controls:HeartsVisualHost>
+
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"></ColumnDefinition>

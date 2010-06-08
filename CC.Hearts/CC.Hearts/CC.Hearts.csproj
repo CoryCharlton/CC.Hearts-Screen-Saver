@@ -59,9 +59,9 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug %28USEVISUAL%29|AnyCPU' ">
-    <OutputPath>bin\Debug %28USEVISUAL%29\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;USEVISUAL</DefineConstants>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug %28REUSEVISUALS%29|AnyCPU' ">
+    <OutputPath>bin\Debug %28REUSEVISUALS%29\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;REUSEVISUALS</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -75,9 +75,9 @@
     <CodeAnalysisRuleDirectories>;C:\Program Files\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release %28USEVISUAL%29|AnyCPU'">
-    <OutputPath>bin\Release %28USEVISUAL%29\</OutputPath>
-    <DefineConstants>TRACE;USEVISUAL</DefineConstants>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release %28REUSEVISUALS%29|AnyCPU' ">
+    <OutputPath>bin\Release %28REUSEVISUALS%29\</OutputPath>
+    <DefineConstants>TRACE;REUSEVISUALS</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -131,12 +131,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="Controls\Heart.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="ScreenSaverWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -155,9 +149,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\Heart.xaml.cs">
-      <DependentUpon>Heart.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Controls\HeartsVisualHost.cs" />
     <Compile Include="Controls\HeartVisual.cs" />
     <Compile Include="Enums.cs" />

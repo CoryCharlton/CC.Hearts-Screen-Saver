@@ -182,9 +182,6 @@ namespace CC.Hearts.Controls
             using (DrawingContext drawingContext = RenderOpen())
             {
                 drawingContext.DrawGeometry(_FillBrush, new Pen(_OutlineBrush, 10), _StreamGeometry);
-                //drawingContext.DrawRectangle(_FillBrush, new Pen(_OutlineBrush, 10), new Rect(0, 0, Width, Height));
-                //drawingContext.DrawEllipse(_FillBrush, new Pen(_OutlineBrush, 10), new Point(Width / 2, Height / 2), Width, Height);
-                //drawingContext.Close();
             }
         }
 
@@ -206,7 +203,6 @@ namespace CC.Hearts.Controls
 
             MaximumAngle = (randomAngleDelta*gravityFactor) + MinimumRandomAngle;
             NegativeXVelocity = (Utilities.RandomNext(0, 2) == 1);
-            Opacity = 0.9;
             XVelocityRatio = Utilities.RandomNext(25, 50)/100.0;
         }
         #endregion
@@ -280,7 +276,7 @@ namespace CC.Hearts.Controls
             const int baseMilliseconds = 250;
             TimeSpan baseTimeSpan = TimeSpan.FromMilliseconds(baseMilliseconds);
             Duration baseDuration = new Duration(baseTimeSpan);
-
+            
             DoubleAnimation leftAnimation = new DoubleAnimation
                                                 {
                                                     AutoReverse = false,
@@ -310,7 +306,7 @@ namespace CC.Hearts.Controls
                                                        AutoReverse = false,
                                                        By = (Gravity/1250)*-1,
                                                        Duration = baseDuration,
-                                                       From = Opacity,
+                                                       From = 0.9,
                                                        IsCumulative = true,
                                                        RepeatBehavior = RepeatBehavior.Forever
                                                    };
@@ -328,6 +324,15 @@ namespace CC.Hearts.Controls
                                                     };
 
             _Rotation.BeginAnimation(RotateTransform.AngleProperty, rotationAnimation, HandoffBehavior.SnapshotAndReplace);
+        }
+
+        public void Stop()
+        {
+            _Translation.BeginAnimation(TranslateTransform.XProperty, null);
+            _Translation.BeginAnimation(TranslateTransform.YProperty, null);
+            _FillBrush.BeginAnimation(Brush.OpacityProperty, null);
+            _OutlineBrush.BeginAnimation(Brush.OpacityProperty, null);
+            _Rotation.BeginAnimation(RotateTransform.AngleProperty, null);
         }
         #endregion
     }

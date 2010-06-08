@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using CC.Utilities;
 
 namespace CC.Hearts.Controls
 {
@@ -15,7 +16,7 @@ namespace CC.Hearts.Controls
         #region Constructor
         public HeartsVisualHost()
         {
-            _Timer = new DispatcherTimer(new TimeSpan(0, 0, 0, 0, 250), DispatcherPriority.Background, TimerTick, Dispatcher);
+            _Timer = new DispatcherTimer(new TimeSpan(0, 0, 0, 0, 250), DispatcherPriority.Background, TimerTick, Dispatcher) {IsEnabled = false};
             _VisualChildren = new VisualCollection(this);
         }
         #endregion
@@ -43,7 +44,6 @@ namespace CC.Hearts.Controls
             Utilities.FixMinMax(ref minHeight, ref maxHeight);
             Utilities.FixMinMax(ref minWidth, ref maxWidth);
 
-            //HeartVisual newHeart = new HeartVisual(Utilities.RandomSolidColorBrush(), Utilities.RandomSolidColorBrush())
             HeartVisual newHeart = new HeartVisual(Utilities.RandomGradientBrush<RadialGradientBrush>(), Utilities.RandomSolidColorBrush())
                                        {
                                            Height = Utilities.RandomNext(minHeight, maxHeight),
@@ -77,6 +77,9 @@ namespace CC.Hearts.Controls
                     {
                         if (!currentHeart.IsReallyVisible(actualHeight, actualWidth))
                         {
+                            currentHeart.Stop();
+                            RenderOptions.SetCachingHint(currentHeart, CachingHint.Unspecified);
+
                             _VisualChildren.RemoveAt(i);
 
                             Settings.DecreaseHeartCount();
@@ -110,15 +113,22 @@ namespace CC.Hearts.Controls
                     for (int i = 0; i < heartsToCreate; i++)
                     {
                         _VisualChildren.Add(CreateHeart(minHeight, maxHeight, minWidth, maxWidth));
-
                         Settings.IncreaseHeartCount();
                     }
+
+                    InvalidateVisual();
                 }
             }
         }
         #endregion
 
         #region Protected Methods
+        // NOTE: Hoping to reduce CPU, wish I could get profiling working
+        protected override Size ArrangeOverride(Size arrangeBounds)
+        {
+            return arrangeBounds;
+        }
+
         protected override Visual GetVisualChild(int index)
         {
             if (index < 0 || index >= _VisualChildren.Count)
@@ -129,20 +139,16 @@ namespace CC.Hearts.Controls
             return _VisualChildren[index];
         }
 
-        //protected override void OnRender(DrawingContext drawingContext)
+        //protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
         //{
-        //    foreach (Visual visualChild in _VisualChildren)
-        //    {
-        //        HeartVisual heartVisual = visualChild as HeartVisual;
-
-        //        if (heartVisual != null)
-        //        {
-        //            RenderTargetBitmap bmp = new RenderTargetBitmap((int)heartVisual.Width, (int)heartVisual.Height, 120, 96, PixelFormats.Pbgra32);
-        //            bmp.Render(heartVisual);
-        //            drawingContext.DrawImage(bmp, new Rect(0,0, heartVisual.Width, heartVisual.Height));
-        //        }
-        //    }
+        //    base.OnVisualChildrenChanged(visualAdded, visualRemoved);
         //}
+
+        // NOTE: Hoping to reduce CPU, wish I could get profiling working
+        protected override void OnRender(DrawingContext dc)
+        {
+
+        }
         #endregion
 
         #region Public Methods

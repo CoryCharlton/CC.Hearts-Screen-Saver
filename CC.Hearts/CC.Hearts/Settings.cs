@@ -244,7 +244,7 @@ namespace CC.Hearts
         public static bool Save()
         {
             bool returnValue;
-
+            
             try
             {
                 using (RegistryKey registryKey = OpenRegistryKey())
