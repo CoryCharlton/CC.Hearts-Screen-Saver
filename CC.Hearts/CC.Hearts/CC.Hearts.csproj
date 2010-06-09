@@ -125,6 +125,7 @@
       <DependentUpon>Heart.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\HeartsCanvas.cs" />
+    <Compile Include="Controls\HeartShape.cs" />
     <Compile Include="Controls\HeartVisual.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="EventArgs\SettingChangedEventArgs.cs" />

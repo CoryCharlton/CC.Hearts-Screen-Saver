@@ -21,23 +21,25 @@ namespace CC.Hearts.Controls
         #endregion
 
         #region Private Fields
-        private readonly Queue<Heart> _Hearts = new Queue<Heart>();
+        private readonly Queue<HeartShape> _Hearts = new Queue<HeartShape>();
         private readonly DispatcherTimer _Timer;
         #endregion
 
         #region Private Methods
-        private Heart CreateHeart(int minHeight, int maxHeight, int minWidth, int maxWidth)
+        private HeartShape CreateHeart(int minHeight, int maxHeight, int minWidth, int maxWidth)
         {
             Utilities.FixMinMax(ref minHeight, ref maxHeight);
             Utilities.FixMinMax(ref minWidth, ref maxWidth);
 
-            Heart newHeart = new Heart(Utilities.RandomGradientBrush<RadialGradientBrush>(), Utilities.RandomSolidColorBrush());
+            HeartShape newHeart = new HeartShape();
+            newHeart.Fill = Utilities.RandomGradientBrush<RadialGradientBrush>();
+            newHeart.Stroke = Utilities.RandomSolidColorBrush();
             ResetHeart(newHeart, minHeight, maxHeight, minWidth, maxWidth);
 
             return newHeart;
         }
 
-        private void ResetHeart(Heart heart, int minHeight, int maxHeight, int minWidth, int maxWidth)
+        private void ResetHeart(HeartShape heart, int minHeight, int maxHeight, int minWidth, int maxWidth)
         {
             heart.Height = Utilities.RandomNext(minHeight, maxHeight);
             heart.Left = Utilities.RandomNext(0, (int) ActualWidth);
@@ -55,7 +57,7 @@ namespace CC.Hearts.Controls
 
                 for (int i = Children.Count - 1; i >= 0; i--)
                 {
-                    Heart currentHeart = Children[i] as Heart;
+                    HeartShape currentHeart = Children[i] as HeartShape;
 
                     if (currentHeart != null)
                     {
@@ -96,7 +98,7 @@ namespace CC.Hearts.Controls
 
                     for (int i = 0; i < heartsToCreate; i++)
                     {
-                        Heart newHeart;
+                        HeartShape newHeart;
 
                         if (_Hearts.Count > 0)
                         {
