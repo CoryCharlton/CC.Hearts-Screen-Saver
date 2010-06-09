@@ -38,8 +38,8 @@ namespace CC.Hearts.Controls
         #endregion
 
         #region Private Fields
-        private static readonly TimeSpan BaseTimeSpan = TimeSpan.FromMilliseconds(BaseMilliseconds);
-        private static readonly Duration BaseDuration = new Duration(BaseTimeSpan);
+        public static readonly TimeSpan BaseTimeSpan = TimeSpan.FromMilliseconds(BaseMilliseconds);
+        public static readonly Duration BaseDuration = new Duration(BaseTimeSpan);
 
         private Brush _FillBrush;
         private double _Gravity;

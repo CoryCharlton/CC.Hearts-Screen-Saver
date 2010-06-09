@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -31,7 +30,7 @@ namespace CC.Hearts
 
             if (validArguments.Contains("d"))
             {
-                Debugger.Launch();
+                //Debugger.Launch(); // NOTE: The only time I use /d is when I want to profile a Release build so launching the debugger is pointless
                 Settings.IsDebug = true;
             }
 

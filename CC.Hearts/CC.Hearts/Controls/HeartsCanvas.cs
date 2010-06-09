@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using CC.Utilities;
 
 namespace CC.Hearts.Controls
 {
@@ -31,9 +26,12 @@ namespace CC.Hearts.Controls
             Utilities.FixMinMax(ref minHeight, ref maxHeight);
             Utilities.FixMinMax(ref minWidth, ref maxWidth);
 
-            HeartShape newHeart = new HeartShape();
-            newHeart.Fill = Utilities.RandomGradientBrush<RadialGradientBrush>();
-            newHeart.Stroke = Utilities.RandomSolidColorBrush();
+            HeartShape newHeart = new HeartShape
+                                      {
+                                          Fill = Utilities.RandomGradientBrush<RadialGradientBrush>(), 
+                                          Stroke = Utilities.RandomSolidColorBrush()
+                                      };
+
             ResetHeart(newHeart, minHeight, maxHeight, minWidth, maxWidth);
 
             return newHeart;

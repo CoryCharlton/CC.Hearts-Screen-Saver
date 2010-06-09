@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Threading;
-using CC.Hearts.Controls;
 using Application = System.Windows.Application;
 using Cursors=System.Windows.Input.Cursors;
-using HorizontalAlignment = System.Windows.HorizontalAlignment;
 using KeyEventArgs=System.Windows.Input.KeyEventArgs;
 using MouseEventArgs=System.Windows.Input.MouseEventArgs;
 
@@ -58,7 +54,10 @@ namespace CC.Hearts
                     _FrameHistory.RemoveAt(0);
                 }
 
+                // ReSharper disable RedundantAssignment
                 _TextBlockFramesPerSecond.Text = "FPS: " + framesPerSecond.ToString("F") + " (" + (_FrameHistory.Aggregate((totalValue, nextValue) => totalValue += nextValue) / _FrameHistory.Count).ToString("F") + " " + _FrameHistory.Count + ")";
+                // ReSharper restore RedundantAssignment
+                _TextBlockHeartCount.Text = "(" + Settings.HeartCount + "/" + Settings.MaximumHearts + ")";
 
                 _FrameCount = 0;
                 _FrameReset = DateTime.Now;
@@ -68,7 +67,6 @@ namespace CC.Hearts
                 _FrameCount++;
             }
 
-            _TextBlockHeartCount.Text = "(" + Settings.HeartCount + "/" + Settings.MaximumHearts + ")";
         }
 
         private void SettingChanged(object sender, SettingChangedEventArgs e)
