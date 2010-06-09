@@ -250,7 +250,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:CC.Hearts Screen Saver"
         "ProductCode" = "8:{A866583A-6449-4385-8E84-C54B26D87689}"
-        "PackageCode" = "8:{C91E15D0-78AB-4201-96F7-DBA47BEDDEDA}"
+        "PackageCode" = "8:{70DA631C-4F8A-4B69-B623-6965E8FFCEB3}"
         "UpgradeCode" = "8:{347AD531-8968-4667-897B-FD4D4528CB97}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
