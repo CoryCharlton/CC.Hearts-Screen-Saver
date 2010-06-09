@@ -196,16 +196,16 @@ namespace CC.Hearts
         #region Public Methods
         public static void DecreaseHeartCount()
         {
-            int currentCount = Interlocked.Decrement(ref _HeartCount);
-            if (currentCount < 0)
+            _HeartCount--;
+            if (_HeartCount < 0)
             {
-                Interlocked.Exchange(ref _HeartCount, 0);
+                _HeartCount = 0;
             }
         }
 
         public static void IncreaseHeartCount()
         {
-            Interlocked.Increment(ref _HeartCount);
+            _HeartCount++;
         }
 
         public static bool Load()

@@ -28,6 +28,7 @@ namespace CC.Hearts.Controls
         #endregion
 
         #region Private Constants
+        private const int BaseMilliseconds = 50;
         private const int DefaultHeight = 352;
         private const int DefaultWidth = 367;
         public const double MaximumGravity = 12.0;
@@ -37,6 +38,9 @@ namespace CC.Hearts.Controls
         #endregion
 
         #region Private Fields
+        private static readonly TimeSpan BaseTimeSpan = TimeSpan.FromMilliseconds(BaseMilliseconds);
+        private static readonly Duration BaseDuration = new Duration(BaseTimeSpan);
+
         private Brush _FillBrush;
         private double _Gravity;
         private double _MaximumAngle;
@@ -124,9 +128,6 @@ namespace CC.Hearts.Controls
         #region Private Methods
         private void SetDefaultValues()
         {
-            _Rotation.CenterX = DefaultWidth / 2.0;
-            _Rotation.CenterY = 0;
-
             _Scale.ScaleX = Width / DefaultWidth;
             _Scale.ScaleY = Height / DefaultHeight;
 
@@ -185,8 +186,14 @@ namespace CC.Hearts.Controls
             return returnValue;
         }
 
+        public void Reset()
+        {
+            SetDefaultValues();
+        }
+
         public void Start()
         {
+            //TODO: Optimize these... I hear setting Opacity on the Brush is better than the Path but I'm not sure about with Cached Composition
             DoubleAnimation rotationAnimation = new DoubleAnimation
                                                     {
                                                         AutoReverse = true,
@@ -203,7 +210,7 @@ namespace CC.Hearts.Controls
                                                {
                                                    AutoReverse = false, 
                                                    By = Gravity, 
-                                                   Duration = new Duration(TimeSpan.FromMilliseconds(50)), 
+                                                   Duration = BaseDuration, 
                                                    From = Opacity, 
                                                    IsAdditive = true, 
                                                    IsCumulative = true,
@@ -216,7 +223,7 @@ namespace CC.Hearts.Controls
                                                {
                                                    AutoReverse = false,
                                                    By = NegativeXVelocity ? Gravity * XVelocityRatio * -1 : Gravity * XVelocityRatio,
-                                                   Duration = new Duration(TimeSpan.FromMilliseconds(50)),
+                                                   Duration = BaseDuration,
                                                    From = Left,
                                                    IsAdditive = true,
                                                    IsCumulative = true,
@@ -229,13 +236,28 @@ namespace CC.Hearts.Controls
                                                 {
                                                     AutoReverse = false,
                                                     By = (Gravity/1000) * -1,
-                                                    Duration = new Duration(TimeSpan.FromMilliseconds(50)),
+                                                    Duration = BaseDuration,
                                                     From = Opacity,
                                                     IsCumulative = true,
                                                     RepeatBehavior = RepeatBehavior.Forever
                                                 };
 
             BeginAnimation(OpacityProperty, opacityAnimation);
+        }
+
+        public void Stop()
+        {
+            //TODO: Clean these up
+            _Rotation.BeginAnimation(RotateTransform.AngleProperty, null);
+            BeginAnimation(Canvas.TopProperty, null);
+            BeginAnimation(Canvas.LeftProperty, null);
+            BeginAnimation(OpacityProperty, null);
+            
+            //_Translation.BeginAnimation(TranslateTransform.XProperty, null);
+            //_Translation.BeginAnimation(TranslateTransform.YProperty, null);
+            //_FillBrush.BeginAnimation(Brush.OpacityProperty, null);
+            //_OutlineBrush.BeginAnimation(Brush.OpacityProperty, null);
+            //_Rotation.BeginAnimation(RotateTransform.AngleProperty, null);
         }
         #endregion
     }

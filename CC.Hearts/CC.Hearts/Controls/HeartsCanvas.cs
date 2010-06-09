@@ -21,6 +21,7 @@ namespace CC.Hearts.Controls
         #endregion
 
         #region Private Fields
+        private readonly Queue<Heart> _Hearts = new Queue<Heart>();
         private readonly DispatcherTimer _Timer;
         #endregion
 
@@ -30,27 +31,19 @@ namespace CC.Hearts.Controls
             Utilities.FixMinMax(ref minHeight, ref maxHeight);
             Utilities.FixMinMax(ref minWidth, ref maxWidth);
 
-            Heart newHeart = new Heart(Utilities.RandomGradientBrush<RadialGradientBrush>(), Utilities.RandomSolidColorBrush())
-                                       {
-                                           Height = Utilities.RandomNext(minHeight, maxHeight),
-                                           Left = Utilities.RandomNext(0, (int) (double) Parent.GetValue(ActualWidthProperty)),
-                                           Width = Utilities.RandomNext(minWidth, maxWidth),
-                                       };
-
-            newHeart.Top = newHeart.Height*-1;
-            newHeart.Start();
-
-            // NOTE: Grasping at straws here ;-)
-
-            /*
-            RenderOptions.SetBitmapScalingMode(newHeart, BitmapScalingMode.LowQuality);
-            RenderOptions.SetCachingHint(newHeart, CachingHint.Cache);
-            RenderOptions.SetEdgeMode(newHeart, EdgeMode.Aliased);
-            */
-
-            //RenderOptions.SetBitmapScalingMode(newHeart, BitmapScalingMode.HighQuality);
+            Heart newHeart = new Heart(Utilities.RandomGradientBrush<RadialGradientBrush>(), Utilities.RandomSolidColorBrush());
+            ResetHeart(newHeart, minHeight, maxHeight, minWidth, maxWidth);
 
             return newHeart;
+        }
+
+        private void ResetHeart(Heart heart, int minHeight, int maxHeight, int minWidth, int maxWidth)
+        {
+            heart.Height = Utilities.RandomNext(minHeight, maxHeight);
+            heart.Left = Utilities.RandomNext(0, (int) ActualWidth);
+            heart.Width = Utilities.RandomNext(minWidth, maxWidth);
+            heart.Top = heart.Height*-1;
+            heart.Start();
         }
 
         private void TimerTick(object sender, EventArgs e)
@@ -68,11 +61,11 @@ namespace CC.Hearts.Controls
                     {
                         if (!currentHeart.IsReallyVisible(actualHeight, actualWidth))
                         {
-                            //currentHeart.Stop(); // TODO: Implement
-                            RenderOptions.SetCachingHint(currentHeart, CachingHint.Unspecified);
+                            currentHeart.Stop();
+
+                            _Hearts.Enqueue(currentHeart);
 
                             Children.RemoveAt(i);
-
                             Settings.DecreaseHeartCount();
                         }
                     }
@@ -103,7 +96,20 @@ namespace CC.Hearts.Controls
 
                     for (int i = 0; i < heartsToCreate; i++)
                     {
-                        Children.Add(CreateHeart(minHeight, maxHeight, minWidth, maxWidth));
+                        Heart newHeart;
+
+                        if (_Hearts.Count > 0)
+                        {
+                            newHeart = _Hearts.Dequeue();
+                            newHeart.Reset();
+                            ResetHeart(newHeart, minHeight, maxHeight, minWidth, maxWidth);
+                        }
+                        else
+                        {
+                            newHeart = CreateHeart(minHeight, maxHeight, minWidth, maxWidth);
+                        }
+
+                        Children.Add(newHeart);
                         Settings.IncreaseHeartCount();
                     }
                 }

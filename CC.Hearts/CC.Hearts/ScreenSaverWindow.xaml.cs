@@ -59,7 +59,6 @@ namespace CC.Hearts
                 }
 
                 _TextBlockFramesPerSecond.Text = "FPS: " + framesPerSecond.ToString("F") + " (" + (_FrameHistory.Aggregate((totalValue, nextValue) => totalValue += nextValue) / _FrameHistory.Count).ToString("F") + " " + _FrameHistory.Count + ")";
-                _TextBlockHeartCount.Text = "(" + Settings.HeartCount + "/" + Settings.MaximumHearts + ")";
 
                 _FrameCount = 0;
                 _FrameReset = DateTime.Now;
@@ -68,6 +67,8 @@ namespace CC.Hearts
             {
                 _FrameCount++;
             }
+
+            _TextBlockHeartCount.Text = "(" + Settings.HeartCount + "/" + Settings.MaximumHearts + ")";
         }
 
         private void SettingChanged(object sender, SettingChangedEventArgs e)
