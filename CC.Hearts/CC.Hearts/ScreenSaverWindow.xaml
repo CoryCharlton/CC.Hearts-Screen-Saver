@@ -7,7 +7,7 @@
             <RowDefinition Name="_RowDebug" Height="0" ></RowDefinition>
         </Grid.RowDefinitions>
         
-        <Controls:HeartsVisualHost x:Name="_HeartsVisualHost" Grid.Row="0"></Controls:HeartsVisualHost>
+        <Controls:HeartsCanvas x:Name="_HeartsVisualHost" Grid.Row="0"></Controls:HeartsCanvas>
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>

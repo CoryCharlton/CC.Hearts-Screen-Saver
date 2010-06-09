@@ -11,40 +11,26 @@ using CC.Utilities;
 
 namespace CC.Hearts.Controls
 {
-    public class HeartsVisualHost : FrameworkElement
+    public class HeartsCanvas : Canvas
     {
         #region Constructor
-        public HeartsVisualHost()
+        public HeartsCanvas()
         {
             _Timer = new DispatcherTimer(new TimeSpan(0, 0, 0, 0, 250), DispatcherPriority.Background, TimerTick, Dispatcher) {IsEnabled = false};
-            _VisualChildren = new VisualCollection(this);
         }
         #endregion
 
         #region Private Fields
         private readonly DispatcherTimer _Timer;
-        private readonly VisualCollection _VisualChildren;
         #endregion
-
-        #region Protected Properties
-        protected override int VisualChildrenCount
-        {
-            get { return _VisualChildren.Count; }
-        }
-        #endregion
-
-        public VisualCollection VisualChildren
-        {
-            get { return _VisualChildren; }
-        }
 
         #region Private Methods
-        private HeartVisual CreateHeart(int minHeight, int maxHeight, int minWidth, int maxWidth)
+        private Heart CreateHeart(int minHeight, int maxHeight, int minWidth, int maxWidth)
         {
             Utilities.FixMinMax(ref minHeight, ref maxHeight);
             Utilities.FixMinMax(ref minWidth, ref maxWidth);
 
-            HeartVisual newHeart = new HeartVisual(Utilities.RandomGradientBrush<RadialGradientBrush>(), Utilities.RandomSolidColorBrush())
+            Heart newHeart = new Heart(Utilities.RandomGradientBrush<RadialGradientBrush>(), Utilities.RandomSolidColorBrush())
                                        {
                                            Height = Utilities.RandomNext(minHeight, maxHeight),
                                            Left = Utilities.RandomNext(0, (int) (double) Parent.GetValue(ActualWidthProperty)),
@@ -55,9 +41,14 @@ namespace CC.Hearts.Controls
             newHeart.Start();
 
             // NOTE: Grasping at straws here ;-)
+
+            /*
             RenderOptions.SetBitmapScalingMode(newHeart, BitmapScalingMode.LowQuality);
             RenderOptions.SetCachingHint(newHeart, CachingHint.Cache);
             RenderOptions.SetEdgeMode(newHeart, EdgeMode.Aliased);
+            */
+
+            //RenderOptions.SetBitmapScalingMode(newHeart, BitmapScalingMode.HighQuality);
 
             return newHeart;
         }
@@ -69,25 +60,25 @@ namespace CC.Hearts.Controls
                 double actualHeight = (double) Parent.GetValue(ActualHeightProperty);
                 double actualWidth = (double) Parent.GetValue(ActualWidthProperty);
 
-                for (int i = _VisualChildren.Count - 1; i >= 0; i--)
+                for (int i = Children.Count - 1; i >= 0; i--)
                 {
-                    HeartVisual currentHeart = _VisualChildren[i] as HeartVisual;
+                    Heart currentHeart = Children[i] as Heart;
 
                     if (currentHeart != null)
                     {
                         if (!currentHeart.IsReallyVisible(actualHeight, actualWidth))
                         {
-                            currentHeart.Stop();
+                            //currentHeart.Stop(); // TODO: Implement
                             RenderOptions.SetCachingHint(currentHeart, CachingHint.Unspecified);
 
-                            _VisualChildren.RemoveAt(i);
+                            Children.RemoveAt(i);
 
                             Settings.DecreaseHeartCount();
                         }
                     }
                     else
                     {
-                        _VisualChildren.RemoveAt(i);
+                        Children.RemoveAt(i);
                     }
                 }
 
@@ -112,7 +103,7 @@ namespace CC.Hearts.Controls
 
                     for (int i = 0; i < heartsToCreate; i++)
                     {
-                        _VisualChildren.Add(CreateHeart(minHeight, maxHeight, minWidth, maxWidth));
+                        Children.Add(CreateHeart(minHeight, maxHeight, minWidth, maxWidth));
                         Settings.IncreaseHeartCount();
                     }
                 }
@@ -120,29 +111,15 @@ namespace CC.Hearts.Controls
         }
         #endregion
 
-        #region Protected Methods
-        // NOTE: Hoping to reduce CPU, wish I could get profiling working
-        protected override Size ArrangeOverride(Size arrangeBounds)
-        {
-            return arrangeBounds;
-        }
-
-        protected override Visual GetVisualChild(int index)
-        {
-            return _VisualChildren[index];
-        }
-
-        // NOTE: Hoping to reduce CPU, wish I could get profiling working
-        protected override void OnRender(DrawingContext dc)
-        {
-
-        }
-        #endregion
-
         #region Public Methods
         public void Start()
         {
             _Timer.Start();
+        }
+
+        public void Stop()
+        {
+            _Timer.Stop();
         }
         #endregion
     }
