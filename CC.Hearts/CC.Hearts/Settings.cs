@@ -29,6 +29,7 @@ namespace CC.Hearts
         public static readonly DependencyProperty HeartCountProperty = DependencyProperty.Register("HeartCount", typeof(int), typeof(Settings), new PropertyMetadata(0));
         public static readonly DependencyProperty MaximumHeartsProperty = DependencyProperty.Register("MaximumHearts", typeof(int), typeof(Settings), new PropertyMetadata(DEFAULT_MAXIMUM_HEARTS, OnMaximumHeartsChanged));
         public static readonly DependencyProperty ScaleProperty = DependencyProperty.Register("Scale", typeof(int), typeof(Settings), new PropertyMetadata(DEFAULT_SCALE, OnScaleChanged));
+        public static readonly DependencyProperty ShowHelpProperty = DependencyProperty.Register("ShowHelp", typeof(bool), typeof(Settings), new PropertyMetadata(DEFAULT_SHOW_HELP));
         public static readonly DependencyProperty ShowStatusProperty = DependencyProperty.Register("ShowStatus", typeof(bool), typeof(Settings), new PropertyMetadata(DEFAULT_SHOW_STATUS));
         #endregion
 
@@ -38,6 +39,7 @@ namespace CC.Hearts
         private const int DEFAULT_FRAMES_PER_SECOND = 45;
         private const int DEFAULT_MAXIMUM_HEARTS = 30;
         private const int DEFAULT_SCALE = 10;
+        private const bool DEFAULT_SHOW_HELP = true;
         private const bool DEFAULT_SHOW_STATUS = false;
         #endregion
 
@@ -45,6 +47,7 @@ namespace CC.Hearts
         private const string FRAMES_PER_SECOND = "FramesPerSecond";
         private const string MAXIMUM_HEARTS = "MaximumHearts";
         private const string SCALE = "Scale";
+        private const string SHOW_HELP = "ShowHelp";
         private const string SHOW_STATUS = "ShowStatus";
 
         private const string REGISTRY_KEY = @"Software\CC.Hearts Screensaver";
@@ -110,6 +113,12 @@ namespace CC.Hearts
         {
             get { return (int)GetValue(ScaleProperty); }
             set { SetValue(ScaleProperty, value); }
+        }
+
+        public bool ShowHelp
+        {
+            get { return (bool)GetValue(ShowHelpProperty); }
+            set { SetValue(ShowHelpProperty, value); }
         }
 
         public bool ShowStatus
@@ -206,6 +215,7 @@ namespace CC.Hearts
                     FramesPerSecond = (int)registryKey.GetValue(FRAMES_PER_SECOND, DEFAULT_FRAMES_PER_SECOND);
                     MaximumHearts = (int)registryKey.GetValue(MAXIMUM_HEARTS, DEFAULT_MAXIMUM_HEARTS);
                     Scale = (int)registryKey.GetValue(SCALE, DEFAULT_SCALE);
+                    ShowHelp = bool.Parse(registryKey.GetValue(SHOW_HELP, DEFAULT_SHOW_HELP).ToString());
                     ShowStatus = bool.Parse(registryKey.GetValue(SHOW_STATUS, DEFAULT_SHOW_STATUS).ToString());
                 }
 
@@ -225,6 +235,7 @@ namespace CC.Hearts
             FramesPerSecond = DEFAULT_FRAMES_PER_SECOND;
             MaximumHearts = DEFAULT_MAXIMUM_HEARTS;
             Scale = DEFAULT_SCALE;
+            ShowHelp = DEFAULT_SHOW_HELP;
             ShowStatus = DEFAULT_SHOW_STATUS;
         }
 
@@ -239,6 +250,7 @@ namespace CC.Hearts
                     registryKey.SetValue(FRAMES_PER_SECOND, FramesPerSecond, RegistryValueKind.DWord);
                     registryKey.SetValue(MAXIMUM_HEARTS, MaximumHearts, RegistryValueKind.DWord);
                     registryKey.SetValue(SCALE, Scale, RegistryValueKind.DWord);
+                    registryKey.SetValue(SHOW_HELP, ShowHelp.ToString(), RegistryValueKind.String);
                     registryKey.SetValue(SHOW_STATUS, ShowStatus.ToString(), RegistryValueKind.String);
 
                     registryKey.Close();

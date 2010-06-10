@@ -12,7 +12,12 @@
         </Style>
     </Window.Resources>
     
-    <Grid Opacity="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=Opacity}" CacheMode="BitmapCache">
+    <Grid Name="_GridMain" Opacity="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=Opacity}">
+        <!-- NOTE: Not so sure about the cache here... -->
+        <Grid.CacheMode>
+            <BitmapCache RenderAtScale="2">
+            </BitmapCache>
+        </Grid.CacheMode>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
@@ -108,10 +113,8 @@
                             <ColumnDefinition Width="*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
 
-                        <CheckBox Style="{StaticResource DefaultCheckBoxStyle}" Name="_CheckBoxShowStatus" Content="Show status info" Checked="_CheckBoxShowStatus_Checked" Unchecked="_CheckBoxShowStatus_Checked"></CheckBox>
-                        <!--<TextBlock Style="{StaticResource DefaultTextBlockStyle}" Name="_TextBlockShowFramesPerSecondLabel" Text="Minimum Size:" Grid.Column="0" />
-                        <Slider Style="{StaticResource DefaultSliderStyle}" Name="_SliderScale" Grid.Column="1" Maximum="15" Minimum="5" ValueChanged="_SliderScale_ValueChanged" LargeChange="5" SmallChange="1" Value="10" />
-                        <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Name="_TextBlockScaleValue" Text="10%" Grid.Column="2" HorizontalAlignment="Center" />-->
+                        <CheckBox Style="{StaticResource DefaultCheckBoxStyle}" Name="_CheckBoxShowStatus" Content="Show status info" Grid.Column="0" HorizontalAlignment="Left" Checked="_CheckBox_Checked" Unchecked="_CheckBox_Checked"></CheckBox>
+                        <CheckBox Style="{StaticResource DefaultCheckBoxStyle}" Name="_CheckBoxShowHelp" Content="Show help at startup" Grid.Column="1" HorizontalAlignment="Right" Checked="_CheckBox_Checked" Unchecked="_CheckBox_Checked" />
                     </Grid>
                 </Border>
 

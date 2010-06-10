@@ -9,7 +9,6 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
 using Application = System.Windows.Application;
 using Binding = System.Windows.Data.Binding;
 using Cursors=System.Windows.Input.Cursors;
@@ -24,6 +23,8 @@ namespace CC.Hearts
         public ScreenSaverWindow()
         {
             InitializeComponent();
+
+            _RowStatus.Height = new GridLength(0);
         }
 
         public ScreenSaverWindow(bool primaryScreen): this()
@@ -43,8 +44,10 @@ namespace CC.Hearts
         #region Private Fields
         private Point _FirstMousePosition;
         private int _FrameCount;
+        private readonly List<double> _FrameHistory = new List<double>();
         private DateTime _FrameReset;
         private readonly bool _IsPrimary;
+        private bool _IsStatusVisible;
         #endregion
 
         #region Public Properties
@@ -56,8 +59,6 @@ namespace CC.Hearts
         #endregion
 
         #region Private Event Handlers
-        private readonly List<double> _FrameHistory = new List<double>();
-
         private void CompositionTargetRendering(object sender, EventArgs e)
         {
             double totalSeconds = (DateTime.Now - _FrameReset).TotalSeconds;
@@ -97,6 +98,13 @@ namespace CC.Hearts
             }
         }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (Settings.Instance.ShowHelp)
+            {
+                ShowHelp(true);
+            }
+        }
         #endregion
 
         #region Private Methods
@@ -126,7 +134,7 @@ namespace CC.Hearts
 
         private void EnableStatus(bool enable)
         {
-            if (enable)
+            if (enable && !_IsStatusVisible)
             {
                 MultiBinding multiBinding = new MultiBinding();
                 multiBinding.Bindings.Add(new Binding
@@ -140,7 +148,12 @@ namespace CC.Hearts
                                           Path = new PropertyPath(Settings.MaximumHeartsProperty),
                                           Source = Settings.Instance
                                       });
-                multiBinding.StringFormat = "({0}/{1})";
+                multiBinding.Bindings.Add(new Binding
+                                              {
+                                                  Path = new PropertyPath(Settings.ScaleProperty),
+                                                  Source = Settings.Instance
+                                              });
+                multiBinding.StringFormat = "{2}% ({0}/{1})";
                 BindingOperations.SetBinding(_TextBlockHeartCount, TextBlock.TextProperty, multiBinding);
                 BindingOperations.SetBinding(_TextBlockFramesPerSecond, TextBlock.TextProperty, new Binding
                                                                                                     {
@@ -153,13 +166,15 @@ namespace CC.Hearts
                 _FrameHistory.Clear();
                 _FrameReset = DateTime.MinValue;
                 _RowStatus.Height = new GridLength(22);
+                _IsStatusVisible = true;
             }
-            else
+            else if (!enable)
             {
                 BindingOperations.ClearBinding(_TextBlockFramesPerSecond, TextBlock.TextProperty);
                 BindingOperations.ClearBinding(_TextBlockHeartCount, TextBlock.TextProperty);
                 CompositionTarget.Rendering -= CompositionTargetRendering;
-                _RowStatus.Height = new GridLength(0);                                
+                _RowStatus.Height = new GridLength(0);
+                _IsStatusVisible = false;
             }
         }
 
@@ -191,6 +206,26 @@ namespace CC.Hearts
                 Topmost = false;
             }
         }
+
+        private void ShowHelp(bool show)
+        {
+            if (show)
+            {
+                _HelpCanvas.Show(30);
+            }
+            else
+            {
+                _HelpCanvas.Hide();
+            }
+        }
+
+        private void ShowOptions()
+        {
+            ShowHelp(false);
+            OptionsWindow optionsWindow = new OptionsWindow { Opacity = 0.85, ShowInTaskbar = false, Topmost = Topmost };
+            optionsWindow.ShowDialog();
+            _FirstMousePosition = Mouse.GetPosition(this);
+        }
         #endregion
 
         #region Protected Methods
@@ -198,14 +233,55 @@ namespace CC.Hearts
         {
             if (!Settings.IsPreview)
             {
-                if (!Settings.IsDebug || e.Key == Key.Escape)
+                switch (e.Key)
                 {
-                    Application.Current.Shutdown();
-                }
-                else if (e.KeyboardDevice.Modifiers == ModifierKeys.Alt && e.KeyboardDevice.IsKeyDown(Key.O))
-                {
-                    OptionsWindow windowOptions = new OptionsWindow {Opacity = 0.85, ShowInTaskbar = false, Topmost = Topmost};
-                    windowOptions.ShowDialog();
+                    case Key.OemQuestion:
+                        {
+                            ShowHelp(_HelpCanvas.Opacity <= 0);
+                            break;
+                        }
+                    case Key.OemComma:
+                        {
+                            EnableStatus(true);
+                            Settings.Instance.MaximumHearts -= 1;
+                            break;                            
+                        }
+                    case Key.OemCloseBrackets:
+                        {
+                            EnableStatus(true);
+                            Settings.Instance.Scale += 1;
+                            break;
+                        }
+                    case Key.OemOpenBrackets:
+                        {
+                            EnableStatus(true);
+                            Settings.Instance.Scale -= 1;
+                            break;                                                        
+                        }
+                    case Key.OemPeriod:
+                        {
+                            EnableStatus(true);
+                            Settings.Instance.MaximumHearts += 1;
+                            break;
+                        }
+                    case Key.O:
+                        {
+                            ShowOptions();
+                            break;
+                        }
+                    case Key.S:
+                        {
+                            Settings.Instance.ShowStatus = !Settings.Instance.ShowStatus;
+                            break;
+                        }
+                    default:
+                        {
+                            if (!Settings.IsDebug || e.Key == Key.Escape)
+                            {
+                                Application.Current.Shutdown();
+                            }
+                            break;
+                        }
                 }
             }
 
@@ -214,7 +290,7 @@ namespace CC.Hearts
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            if (!Settings.IsDebug && !Settings.IsPreview)
+            if (!Settings.IsPreview && !Settings.IsDebug)
             {
                 Point currentPosition = e.GetPosition(this);
 
@@ -223,7 +299,7 @@ namespace CC.Hearts
                     _FirstMousePosition = currentPosition;
                 }
 
-                if (Point.Subtract(_FirstMousePosition, currentPosition).Length > 20)
+                if (Point.Subtract(_FirstMousePosition, currentPosition).Length > 30)
                 {
                     Application.Current.Shutdown();
                 }

@@ -12,6 +12,7 @@ namespace CC.Hearts
         public OptionsWindow()
         {
             InitializeComponent();
+            _GridMain.CacheMode = new BitmapCache(2);
 
             SettingsToWindow();
             SetToolTips();
@@ -58,7 +59,7 @@ namespace CC.Hearts
             Close();
         }
 
-        private void _CheckBoxShowStatus_Checked(object sender, RoutedEventArgs e)
+        private void _CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             UpdateApplyButton();
         }
@@ -99,6 +100,11 @@ namespace CC.Hearts
         {
             bool returnValue = false;
 
+            if (_CheckBoxShowHelp != null && _CheckBoxShowHelp.IsChecked.GetValueOrDefault() != Settings.Instance.ShowHelp)
+            {
+                returnValue = true;
+            }
+
             if (_CheckBoxShowStatus != null && _CheckBoxShowStatus.IsChecked.GetValueOrDefault() != Settings.Instance.ShowStatus)
             {
                 returnValue = true;
@@ -131,6 +137,7 @@ namespace CC.Hearts
 
         private void SettingsToWindow()
         {
+            _CheckBoxShowHelp.IsChecked = Settings.Instance.ShowHelp;
             _CheckBoxShowStatus.IsChecked = Settings.Instance.ShowStatus;
             _SliderFramesPerSecond.Value = Settings.Instance.FramesPerSecond;
             _SliderMaximumHearts.Value = Settings.Instance.MaximumHearts;
@@ -167,6 +174,7 @@ namespace CC.Hearts
             Settings.Instance.FramesPerSecond = (int)_SliderFramesPerSecond.Value;
             Settings.Instance.MaximumHearts = (int)_SliderMaximumHearts.Value;
             Settings.Instance.Scale = (int)_SliderScale.Value;
+            Settings.Instance.ShowHelp = _CheckBoxShowStatus.IsChecked.GetValueOrDefault();
             Settings.Instance.ShowStatus = _CheckBoxShowStatus.IsChecked.GetValueOrDefault();
         }
         #endregion
