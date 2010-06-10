@@ -11,6 +11,8 @@ namespace CC.Hearts.Controls
         #region Constructor
         public HeartShape()
         {
+            _VisualCollection = new VisualCollection(this) {_HeartVisual};
+
             SetDefaultValues();
             CreateTransforms();
         }
@@ -34,12 +36,13 @@ namespace CC.Hearts.Controls
         private RotateTransform _Rotation;
         private ScaleTransform _Scale;
         private TransformGroup _TransformGroup;
+        private readonly VisualCollection _VisualCollection;
         #endregion
 
         #region Protected Properties
         protected override int VisualChildrenCount
         {
-            get { return 1; }
+            get { return _VisualCollection.Count; }
         }
         #endregion
 
@@ -125,7 +128,7 @@ namespace CC.Hearts.Controls
             _TransformGroup.Children.Add(_Rotation);
             _TransformGroup.Children.Add(_Scale);
 
-            RenderTransform = _TransformGroup; //NOTE: Is this right?
+            RenderTransform = _TransformGroup;
         }
 
         private void SetDefaultValues()
@@ -147,7 +150,7 @@ namespace CC.Hearts.Controls
         #region Protected Methods
         protected override Visual GetVisualChild(int index)
         {
-            return _HeartVisual;
+            return _VisualCollection[index];
         }
 
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)

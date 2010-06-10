@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace CC.Hearts
@@ -11,8 +12,6 @@ namespace CC.Hearts
         public OptionsWindow()
         {
             InitializeComponent();
-
-            Icon = BitmapFrame.Create(new Uri("pack://application:,,,/Resources/Heart.ico", UriKind.RelativeOrAbsolute));
 
             SettingsToWindow();
             SetToolTips();
@@ -47,7 +46,7 @@ namespace CC.Hearts
         {
             if (MessageBoxResult.Yes == MessageBox.Show("Are you sure you want to reset all settings to their default values?", System.Windows.Forms.Application.ProductName, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No))
             {
-                Settings.Reset();
+                Settings.Instance.Reset();
                 SettingsToWindow();
                 Save();
             }
@@ -100,22 +99,22 @@ namespace CC.Hearts
         {
             bool returnValue = false;
 
-            if (_CheckBoxShowStatus != null && _CheckBoxShowStatus.IsChecked.GetValueOrDefault() != Settings.ShowStatus)
+            if (_CheckBoxShowStatus != null && _CheckBoxShowStatus.IsChecked.GetValueOrDefault() != Settings.Instance.ShowStatus)
             {
                 returnValue = true;
             }
 
-            if (_SliderFramesPerSecond != null && (int)_SliderFramesPerSecond.Value != Settings.FramesPerSecond)
+            if (_SliderFramesPerSecond != null && (int)_SliderFramesPerSecond.Value != Settings.Instance.FramesPerSecond)
             {
                 returnValue = true;
             }
 
-            if (_SliderMaximumHearts != null && (int)_SliderMaximumHearts.Value != Settings.MaximumHearts)
+            if (_SliderMaximumHearts != null && (int)_SliderMaximumHearts.Value != Settings.Instance.MaximumHearts)
             {
                 returnValue = true;
             }
 
-            if (_SliderScale != null && (int)_SliderScale.Value != Settings.Scale)
+            if (_SliderScale != null && (int)_SliderScale.Value != Settings.Instance.Scale)
             {
                 returnValue = true;
             }
@@ -126,16 +125,16 @@ namespace CC.Hearts
         private void Save()
         {
             WindowToSettings();
-            Settings.Save();
+            Settings.Instance.Save();
             UpdateApplyButton();
         }
 
         private void SettingsToWindow()
         {
-            _CheckBoxShowStatus.IsChecked = Settings.ShowStatus;
-            _SliderFramesPerSecond.Value = Settings.FramesPerSecond;
-            _SliderMaximumHearts.Value = Settings.MaximumHearts;
-            _SliderScale.Value = Settings.Scale;
+            _CheckBoxShowStatus.IsChecked = Settings.Instance.ShowStatus;
+            _SliderFramesPerSecond.Value = Settings.Instance.FramesPerSecond;
+            _SliderMaximumHearts.Value = Settings.Instance.MaximumHearts;
+            _SliderScale.Value = Settings.Instance.Scale;
         }
 
         private void SetToolTips()
@@ -165,10 +164,10 @@ namespace CC.Hearts
 
         private void WindowToSettings()
         {
-            Settings.FramesPerSecond = (int)_SliderFramesPerSecond.Value;
-            Settings.MaximumHearts = (int)_SliderMaximumHearts.Value;
-            Settings.Scale = (int)_SliderScale.Value;
-            Settings.ShowStatus = _CheckBoxShowStatus.IsChecked.GetValueOrDefault();
+            Settings.Instance.FramesPerSecond = (int)_SliderFramesPerSecond.Value;
+            Settings.Instance.MaximumHearts = (int)_SliderMaximumHearts.Value;
+            Settings.Instance.Scale = (int)_SliderScale.Value;
+            Settings.Instance.ShowStatus = _CheckBoxShowStatus.IsChecked.GetValueOrDefault();
         }
         #endregion
     }

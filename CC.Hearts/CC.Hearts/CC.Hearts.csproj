@@ -99,10 +99,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="Controls\Heart.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="ScreenSaverWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -121,14 +117,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\Heart.xaml.cs">
-      <DependentUpon>Heart.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Controls\HeartsCanvas.cs" />
     <Compile Include="Controls\HeartShape.cs" />
     <Compile Include="Controls\HeartVisual.cs" />
     <Compile Include="Enums.cs" />
-    <Compile Include="EventArgs\SettingChangedEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

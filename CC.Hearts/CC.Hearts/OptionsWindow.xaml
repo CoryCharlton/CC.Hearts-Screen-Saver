@@ -1,7 +1,7 @@
 ﻿<Window x:Class="CC.Hearts.OptionsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="CC.Hearts Screensaver - Settings" Height="310" Width="420" WindowStyle="None" ResizeMode="NoResize" AllowsTransparency="True" Opacity="1" Visibility="Visible" Background="Transparent" WindowStartupLocation="CenterScreen" ShowInTaskbar="True" DataContext="{Binding}">
+    Title="CC.Hearts Screensaver - Settings" Height="310" Width="420" WindowStyle="None" ResizeMode="NoResize" AllowsTransparency="True" Opacity="1" Visibility="Visible" Background="Transparent" WindowStartupLocation="CenterScreen" ShowInTaskbar="True" Icon="{StaticResource HeartImage}">
     <Window.Resources>
         <Style x:Key="OptionsButton" TargetType="{x:Type Button}">
             <Setter Property="Height" Value="24"></Setter>
@@ -12,7 +12,7 @@
         </Style>
     </Window.Resources>
     
-    <Grid Opacity="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=Opacity}">
+    <Grid Opacity="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=Opacity}" CacheMode="BitmapCache">
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>

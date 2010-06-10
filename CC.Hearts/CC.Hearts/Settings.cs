@@ -1,18 +1,35 @@
 ﻿using System;
-using System.Threading;
+using System.ComponentModel;
+using System.Windows;
 using CC.Utilities;
 using Microsoft.Win32;
 
 namespace CC.Hearts
 {
-    public static class Settings
+    public sealed class Settings : DependencyObject, INotifyPropertyChanged
     {
         #region Constructor
         static Settings()
         {
+            Instance = new Settings();
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Settings"/>. Consider using <see cref="Settings.Instance"/> instead.
+        /// </summary>
+        public Settings()
+        {
             Reset();
             Load();
         }
+        #endregion
+
+        #region Dependency Properties
+        public static readonly DependencyProperty FramesPerSecondProperty = DependencyProperty.Register("FramesPerSecond", typeof(int), typeof(Settings), new PropertyMetadata(DEFAULT_FRAMES_PER_SECOND, OnFramesPerSecondChanged));
+        public static readonly DependencyProperty HeartCountProperty = DependencyProperty.Register("HeartCount", typeof(int), typeof(Settings), new PropertyMetadata(0));
+        public static readonly DependencyProperty MaximumHeartsProperty = DependencyProperty.Register("MaximumHearts", typeof(int), typeof(Settings), new PropertyMetadata(DEFAULT_MAXIMUM_HEARTS, OnMaximumHeartsChanged));
+        public static readonly DependencyProperty ScaleProperty = DependencyProperty.Register("Scale", typeof(int), typeof(Settings), new PropertyMetadata(DEFAULT_SCALE, OnScaleChanged));
+        public static readonly DependencyProperty ShowStatusProperty = DependencyProperty.Register("ShowStatus", typeof(bool), typeof(Settings), new PropertyMetadata(DEFAULT_SHOW_STATUS));
         #endregion
 
         #region Private Constants
@@ -49,52 +66,29 @@ namespace CC.Hearts
         // ReSharper restore InconsistentNaming
         #endregion
 
-        #region Private Fields
-        private static int _FramesPerSecond;
-        private static int _HeartCount;
-        private static bool _IsLoaded;
-        private static int _MaximumHearts;
-        private static int _Scale;
-        private static bool _ShowStatus;
+        #region Public Events
+        public event PropertyChangedEventHandler PropertyChanged;
         #endregion
 
-        #region Public Events
-        public static EventHandler<SettingChangedEventArgs> SettingChanged;
+        #region Private Fields
+        private bool _IsLoaded;
+        #endregion
+
+        #region Public Fields
+        public static Settings Instance;
         #endregion
 
         #region Public Properties
-        public static int FramesPerSecond
+        public int FramesPerSecond
         {
-            get { return _FramesPerSecond; }
-            set
-            {
-                int targetValue = value;
-
-                if (value > MAXIMUM_FRAMES_PER_SECOND)
-                {
-                    targetValue = MAXIMUM_FRAMES_PER_SECOND;
-                }
-                else if (value < MINIMUM_FRAMES_PER_SECOND)
-                {
-                    targetValue = MINIMUM_FRAMES_PER_SECOND;
-                }
-
-                if (targetValue != _FramesPerSecond)
-                {
-                    _FramesPerSecond = targetValue;
-
-                    OnSettingChanged(CreateSettingChangedEventArgs(Setting.FramesPerSecond));
-                }
-            }
+            get { return (int)GetValue(FramesPerSecondProperty); }
+            set { SetValue(FramesPerSecondProperty, value); }
         }
 
-        public static int HeartCount
+        public int HeartCount
         {
-            get { return _HeartCount; }
-            set
-            {
-                Interlocked.Exchange(ref _HeartCount, value);
-            }
+            get { return (int)GetValue(HeartCountProperty); }
+            set { SetValue(HeartCountProperty, value); }
         }
 
         public static bool IsDebug { get; set; }
@@ -104,111 +98,104 @@ namespace CC.Hearts
             get { return PreviewHandle != IntPtr.Zero; }
         }
 
-        public static int MaximumHearts
+        public int MaximumHearts
         {
-            get { return _MaximumHearts; }
-            set
-            {
-                int targetValue = value;
-
-                if (value > MAXIMUM_MAXIMUM_HEARTS)
-                {
-                    targetValue = MAXIMUM_MAXIMUM_HEARTS;
-                }
-                else if (value < MINIMUM_MAXIMUM_HEARTS)
-                {
-                    targetValue = MINIMUM_MAXIMUM_HEARTS;
-                }
-
-                if (targetValue != _MaximumHearts)
-                {
-                    _MaximumHearts = targetValue;
-
-                    OnSettingChanged(CreateSettingChangedEventArgs(Setting.MaximumHearts));
-                }
-            }
+            get { return (int) GetValue(MaximumHeartsProperty); }
+            set { SetValue(MaximumHeartsProperty, value); }
         }
 
         public static IntPtr PreviewHandle { get; set; }
 
-        public static int Scale
+        public int Scale
         {
-            get { return _Scale; }
-            set
-            {
-                int targetValue = value;
-
-                if (value > MAXIMUM_SCALE)
-                {
-                    targetValue = MAXIMUM_SCALE;
-                }
-                else if (value < MINIMUM_SCALE)
-                {
-                    targetValue = MINIMUM_SCALE;
-                }
-
-                if (targetValue != _Scale)
-                {
-                    _Scale = targetValue;
-
-                    OnSettingChanged(CreateSettingChangedEventArgs(Setting.Scale));
-                }
-            }
+            get { return (int)GetValue(ScaleProperty); }
+            set { SetValue(ScaleProperty, value); }
         }
 
-        public static bool ShowStatus
+        public bool ShowStatus
         {
-            get { return _ShowStatus; }
-            set
-            {
-                if (_ShowStatus != value)
-                {
-                    _ShowStatus = value;
-
-                    OnSettingChanged(CreateSettingChangedEventArgs(Setting.ShowStatus));
-                }
-            }
+            get { return (bool) GetValue(ShowStatusProperty); }
+            set { SetValue(ShowStatusProperty, value); }
         }
 
         public static int Tier { get; set; }
         #endregion
 
         #region Private Methods
-        private static SettingChangedEventArgs CreateSettingChangedEventArgs(Setting setting)
-        {
-            return new SettingChangedEventArgs(setting, !_IsLoaded);            
-        }
-
         private static RegistryKey OpenRegistryKey()
         {
             return (Registry.LocalMachine.CreateSubKey(REGISTRY_KEY));
         }
 
-        private static void OnSettingChanged(SettingChangedEventArgs eventArgs)
+        private static void OnFramesPerSecondChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (SettingChanged != null)
+            int value = (int)e.NewValue;
+            if (value > MAXIMUM_FRAMES_PER_SECOND)
             {
-                SettingChanged(null, eventArgs);
+                d.SetValue(e.Property, MAXIMUM_FRAMES_PER_SECOND);
+            }
+            else if (value < MINIMUM_FRAMES_PER_SECOND)
+            {
+                d.SetValue(e.Property, MINIMUM_FRAMES_PER_SECOND);
             }
         }
+
+        private static void OnMaximumHeartsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            int value = (int)e.NewValue;
+            if (value > MAXIMUM_MAXIMUM_HEARTS)
+            {
+                d.SetValue(e.Property, MAXIMUM_MAXIMUM_HEARTS);
+            }
+            else if (value < MINIMUM_MAXIMUM_HEARTS)
+            {
+                d.SetValue(e.Property, MINIMUM_MAXIMUM_HEARTS);
+            }
+        }
+
+        protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+        {
+            PropertyChangedEventHandler propertyChangedEventHandler = PropertyChanged;
+            if (propertyChangedEventHandler != null)
+            {
+                propertyChangedEventHandler(this, new PropertyChangedEventArgs(e.Property.Name));
+            }
+
+            base.OnPropertyChanged(e);
+        }
+
+        private static void OnScaleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            int value = (int)e.NewValue;
+
+            if (value > MAXIMUM_SCALE)
+            {
+                d.SetValue(e.Property, MAXIMUM_SCALE);
+            }
+            else if (value < MINIMUM_SCALE)
+            {
+                d.SetValue(e.Property, MINIMUM_SCALE);
+            }
+        }
+
         #endregion
 
         #region Public Methods
-        public static void DecreaseHeartCount()
+        public void DecreaseHeartCount()
         {
-            _HeartCount--;
-            if (_HeartCount < 0)
+            HeartCount--;
+            if (HeartCount < 0)
             {
-                _HeartCount = 0;
+                HeartCount = 0;
             }
         }
 
-        public static void IncreaseHeartCount()
+        public void IncreaseHeartCount()
         {
-            _HeartCount++;
+            HeartCount++;
         }
 
-        public static bool Load()
+        public bool Load()
         {
             _IsLoaded = false;
 
@@ -233,7 +220,7 @@ namespace CC.Hearts
             return _IsLoaded;
         }
 
-        public static void Reset()
+        public void Reset()
         {
             FramesPerSecond = DEFAULT_FRAMES_PER_SECOND;
             MaximumHearts = DEFAULT_MAXIMUM_HEARTS;
@@ -241,10 +228,10 @@ namespace CC.Hearts
             ShowStatus = DEFAULT_SHOW_STATUS;
         }
 
-        public static bool Save()
+        public bool Save()
         {
             bool returnValue;
-            
+
             try
             {
                 using (RegistryKey registryKey = OpenRegistryKey())
@@ -253,10 +240,10 @@ namespace CC.Hearts
                     registryKey.SetValue(MAXIMUM_HEARTS, MaximumHearts, RegistryValueKind.DWord);
                     registryKey.SetValue(SCALE, Scale, RegistryValueKind.DWord);
                     registryKey.SetValue(SHOW_STATUS, ShowStatus.ToString(), RegistryValueKind.String);
-                    
+
                     registryKey.Close();
-                }      
-          
+                }
+
                 returnValue = true;
             }
             catch (Exception e)

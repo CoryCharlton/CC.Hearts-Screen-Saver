@@ -66,7 +66,7 @@ namespace CC.Hearts.Controls
                             _Hearts.Enqueue(currentHeart);
 
                             Children.RemoveAt(i);
-                            Settings.DecreaseHeartCount();
+                            Settings.Instance.DecreaseHeartCount();
                         }
                     }
                     else
@@ -75,21 +75,21 @@ namespace CC.Hearts.Controls
                     }
                 }
 
-                int currentCount = Settings.HeartCount;
+                int currentCount = Settings.Instance.HeartCount;
 
-                if (currentCount < Settings.MaximumHearts)
+                if (currentCount < Settings.Instance.MaximumHearts)
                 {
-                    int maxHearts = ((Settings.MaximumHearts - currentCount)/10) + 1;
+                    int maxHearts = ((Settings.Instance.MaximumHearts - currentCount)/10) + 1;
 
                     if (maxHearts == 1)
                     {
                         maxHearts = 2;
                     }
 
-                    int minHeight = (int) (actualHeight*(Settings.Scale/150.0));
+                    int minHeight = (int) (actualHeight*(Settings.Instance.Scale/150.0));
                     int maxHeight = minHeight*2;
 
-                    int minWidth = (int) (actualWidth*(Settings.Scale/150.0));
+                    int minWidth = (int) (actualWidth*(Settings.Instance.Scale/150.0));
                     int maxWidth = minWidth*2;
 
                     int heartsToCreate = Utilities.RandomNext(1, maxHearts);
@@ -110,7 +110,7 @@ namespace CC.Hearts.Controls
                         }
 
                         Children.Add(newHeart);
-                        Settings.IncreaseHeartCount();
+                        Settings.Instance.IncreaseHeartCount();
                     }
                 }
             }

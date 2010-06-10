@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 using Application = System.Windows.Application;
+using Binding = System.Windows.Data.Binding;
 using Cursors=System.Windows.Input.Cursors;
 using KeyEventArgs=System.Windows.Input.KeyEventArgs;
 using MouseEventArgs=System.Windows.Input.MouseEventArgs;
@@ -19,8 +24,6 @@ namespace CC.Hearts
         public ScreenSaverWindow()
         {
             InitializeComponent();
-
-            _HeartsVisualHost.Start();
         }
 
         public ScreenSaverWindow(bool primaryScreen): this()
@@ -28,7 +31,13 @@ namespace CC.Hearts
             _IsPrimary = primaryScreen;
 
             SetupScreenSaver();
+            
+            _HeartsCanvas.Start();
         }
+        #endregion
+
+        #region Dependency Properties
+        public static readonly DependencyProperty FramesPerSecondProperty = DependencyProperty.Register("FramesPerSecond", typeof(double), typeof(ScreenSaverWindow), new PropertyMetadata(0.00));
         #endregion
 
         #region Private Fields
@@ -36,6 +45,14 @@ namespace CC.Hearts
         private int _FrameCount;
         private DateTime _FrameReset;
         private readonly bool _IsPrimary;
+        #endregion
+
+        #region Public Properties
+        public double FramesPerSecond
+        {
+            get { return (double)GetValue(FramesPerSecondProperty); }
+            set { SetValue(FramesPerSecondProperty, value); }
+        }
         #endregion
 
         #region Private Event Handlers
@@ -55,9 +72,8 @@ namespace CC.Hearts
                 }
 
                 // ReSharper disable RedundantAssignment
-                _TextBlockFramesPerSecond.Text = "FPS: " + framesPerSecond.ToString("F") + " (" + (_FrameHistory.Aggregate((totalValue, nextValue) => totalValue += nextValue) / _FrameHistory.Count).ToString("F") + " " + _FrameHistory.Count + ")";
-                // ReSharper restore RedundantAssignment
-                _TextBlockHeartCount.Text = "(" + Settings.HeartCount + "/" + Settings.MaximumHearts + ")";
+                FramesPerSecond = _FrameHistory.Aggregate((totalValue, nextValue) => totalValue += nextValue) / _FrameHistory.Count;
+                //_TextBlockHeartCount.Text = "(" + Settings.HeartCount + "/" + Settings.MaximumHearts + ")";
 
                 _FrameCount = 0;
                 _FrameReset = DateTime.Now;
@@ -69,37 +85,18 @@ namespace CC.Hearts
 
         }
 
-        private void SettingChanged(object sender, SettingChangedEventArgs e)
+        private void SettingsPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (!e.IsLoadEvent)
+            switch (e.PropertyName)
             {
-                switch (e.Setting)
-                {
-                    case Setting.FramesPerSecond:
-                        {
-                            //TODO: How can I undo this? From the documentation it looks like I can't since it's already in use...
-                            //Timeline.DesiredFrameRateProperty.OverrideMetadata(typeof(Timeline), new FrameworkPropertyMetadata { DefaultValue = Settings.FramesPerSecond });
-                            break;
-                        }
-                    case Setting.ShowStatus:
-                        {
-                            if (Settings.ShowStatus)// || Settings.IsDebug)
-                            {
-                                CompositionTarget.Rendering -= CompositionTargetRendering;
-                                CompositionTarget.Rendering += CompositionTargetRendering;
-                                _RowDebug.Height = new GridLength(22);
-                            }
-                            else
-                            {
-                                CompositionTarget.Rendering -= CompositionTargetRendering;
-                                _RowDebug.Height = new GridLength(0);                                
-                            }
-
-                            break;
-                        }
-                }
+                case "ShowStatus":
+                    {
+                        EnableStatus(Settings.Instance.ShowStatus);
+                        break;
+                    }
             }
         }
+
         #endregion
 
         #region Private Methods
@@ -127,13 +124,48 @@ namespace CC.Hearts
             }
         }
 
+        private void EnableStatus(bool enable)
+        {
+            if (enable)
+            {
+                MultiBinding multiBinding = new MultiBinding();
+                multiBinding.Bindings.Add(new Binding
+                                      {
+                                          Path = new PropertyPath(Settings.HeartCountProperty),
+                                          Source = Settings.Instance
+                                      });
+
+                multiBinding.Bindings.Add(new Binding
+                                      {
+                                          Path = new PropertyPath(Settings.MaximumHeartsProperty),
+                                          Source = Settings.Instance
+                                      });
+                multiBinding.StringFormat = "({0}/{1})";
+                BindingOperations.SetBinding(_TextBlockHeartCount, TextBlock.TextProperty, multiBinding);
+                BindingOperations.SetBinding(_TextBlockFramesPerSecond, TextBlock.TextProperty, new Binding
+                                                                                                    {
+                                                                                                        Path = new PropertyPath(FramesPerSecondProperty), 
+                                                                                                        StringFormat = "{0:N} FPS", 
+                                                                                                        Source = this
+                                                                                                    });
+                CompositionTarget.Rendering += CompositionTargetRendering;
+                _FrameCount = 0;
+                _FrameHistory.Clear();
+                _FrameReset = DateTime.MinValue;
+                _RowStatus.Height = new GridLength(22);
+            }
+            else
+            {
+                BindingOperations.ClearBinding(_TextBlockFramesPerSecond, TextBlock.TextProperty);
+                BindingOperations.ClearBinding(_TextBlockHeartCount, TextBlock.TextProperty);
+                CompositionTarget.Rendering -= CompositionTargetRendering;
+                _RowStatus.Height = new GridLength(0);                                
+            }
+        }
+
         private void SetupScreenSaver()
         {
-            if (_IsPrimary && (Settings.IsDebug || Settings.ShowStatus))
-            {
-                CompositionTarget.Rendering += CompositionTargetRendering;
-                _RowDebug.Height = new GridLength(22);
-            }
+            EnableStatus(_IsPrimary && (Settings.IsDebug || Settings.Instance.ShowStatus));
 
             if (!Settings.IsDebug)
             {
@@ -146,9 +178,8 @@ namespace CC.Hearts
 
                 if (_IsPrimary)
                 {
-                    Timeline.DesiredFrameRateProperty.OverrideMetadata(typeof(Timeline), new FrameworkPropertyMetadata { DefaultValue = Settings.FramesPerSecond });
-                    Settings.SettingChanged += SettingChanged;
-
+                    Timeline.DesiredFrameRateProperty.OverrideMetadata(typeof(Timeline), new FrameworkPropertyMetadata { DefaultValue = Settings.Instance.FramesPerSecond });
+                    Settings.Instance.PropertyChanged += SettingsPropertyChanged;
                     Show();
                     WindowState = WindowState.Maximized;
 
