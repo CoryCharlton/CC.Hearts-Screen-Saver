@@ -177,7 +177,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:CCHearts, Version=1.0.10.608, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:CCHearts, Version=1.0.10.609, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_D90D07838E4740CA9D6A4CE71B926B8B"
@@ -249,15 +249,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:CC.Hearts Screen Saver"
-        "ProductCode" = "8:{A866583A-6449-4385-8E84-C54B26D87689}"
-        "PackageCode" = "8:{70DA631C-4F8A-4B69-B623-6965E8FFCEB3}"
+        "ProductCode" = "8:{7B9AB48A-33A2-4630-B529-488B7FD16660}"
+        "PackageCode" = "8:{C111DDC5-C080-428C-8F68-2EC7757DB296}"
         "UpgradeCode" = "8:{347AD531-8968-4667-897B-FD4D4528CB97}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:1.0.1"
+        "ProductVersion" = "8:1.0.2"
         "Manufacturer" = "8:CC Software Engineering"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://www.ccswe.com"
