@@ -133,7 +133,7 @@ namespace CC.Hearts.Controls
 
         private void SetDefaultValues()
         {
-            CacheMode = new BitmapCache();
+            CacheMode = new BitmapCache() {EnableClearType = true, SnapsToDevicePixels = true};
             Gravity = Utilities.RandomNext((int)MinimumGravity, (int)(MaximumGravity + 1));
             Height = HeartVisual.DefaultHeight;
             Width = HeartVisual.DefaultWidth;

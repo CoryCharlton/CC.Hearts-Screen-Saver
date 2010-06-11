@@ -73,7 +73,7 @@ namespace CC.Hearts
                     _ScreenSaverWindow.Width = hwndSourceParameters.Width;
                     _ScreenSaverWindow.Visibility = Visibility.Hidden;
 
-                    _HwndSource = new HwndSource(hwndSourceParameters) {RootVisual = _ScreenSaverWindow._GridMain};
+                    _HwndSource = new HwndSource(hwndSourceParameters) { RootVisual = _ScreenSaverWindow.LayoutRoot };
                     _HwndSource.Disposed += _HwndSource_Disposed;
                 }
                 else

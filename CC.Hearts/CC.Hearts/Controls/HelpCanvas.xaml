@@ -1,102 +1,56 @@
 ﻿<Canvas x:Class="CC.Hearts.Controls.HelpCanvas"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
-             Height="265" Width="265" Opacity="0.9">
+             Height="265" Width="265">
+    <Canvas.Resources>
+        <Style x:Key="KeyTextBlockStyle" BasedOn="{StaticResource DefaultTextBlockStyle}" TargetType="{x:Type TextBlock}">
+            <Setter Property="DockPanel.Dock" Value="Right"></Setter>
+            <Setter Property="TextAlignment" Value="Center"></Setter>
+            <Setter Property="Margin" Value="0,2,10,2"></Setter>
+            <Setter Property="Width" Value="50"></Setter>
+        </Style>
+    </Canvas.Resources>
+    
+    <Canvas.CacheMode>
+        <BitmapCache EnableClearType="True" RenderAtScale="1" SnapsToDevicePixels="True"></BitmapCache>
+    </Canvas.CacheMode>
 
-    <Grid Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Canvas, AncestorLevel=1}, Path=Height}" Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Canvas, AncestorLevel=1}, Path=Width}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"></RowDefinition>
-        </Grid.RowDefinitions>
+    <Border Style="{StaticResource DefaultBorderStyle}" Height="265" Width="265" Padding="10">
+        <DockPanel LastChildFill="False">
+            <Border Style="{StaticResource DefaultBorderStyle}" Margin="0,0,0,10" Height="40" DockPanel.Dock="Top">
+                <DockPanel LastChildFill="False">
+                    <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Text="Toggle Help"/>
+                    <TextBlock Style="{StaticResource KeyTextBlockStyle}" Text="?" />
+                </DockPanel>
+            </Border>
 
-        <Border Style="{StaticResource DefaultBorderStyle}" Grid.Row="1">
-            <Grid Name="_GridContent" Margin="10">
-                <Grid.RowDefinitions>
-                    <!-- 0 -->
-                    <RowDefinition Height="40"></RowDefinition>
-                    <!-- 1 -->
-                    <RowDefinition Height="10"></RowDefinition>
-                    <!-- 2 -->
-                    <RowDefinition Height="40"></RowDefinition>
-                    <!-- 3 -->
-                    <RowDefinition Height="10"></RowDefinition>
-                    <!-- 4 -->
-                    <RowDefinition Height="40"></RowDefinition>
-                    <!-- 3 -->
-                    <RowDefinition Height="10"></RowDefinition>
-                    <!-- 4 -->
-                    <RowDefinition Height="40"></RowDefinition>
-                    <!-- 5 -->
-                    <RowDefinition Height="10"></RowDefinition>
-                    <!-- 6 -->
-                    <RowDefinition Height="40"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
-                </Grid.RowDefinitions>
+            <Border Style="{StaticResource DefaultBorderStyle}" Margin="0,0,0,10" Height="40" DockPanel.Dock="Top">
+                <DockPanel LastChildFill="False">
+                    <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Text="Toggle Status Info"/>
+                    <TextBlock Style="{StaticResource KeyTextBlockStyle}" Text="S" />
+                </DockPanel>
+            </Border>
 
-                <Border Style="{StaticResource DefaultBorderStyle}" Grid.Row="0" Margin="0">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                            <ColumnDefinition Width="50"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
+            <Border Style="{StaticResource DefaultBorderStyle}" Margin="0,0,0,10" Height="40" DockPanel.Dock="Top">
+                <DockPanel LastChildFill="False">
+                    <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Text="Show Options"/>
+                    <TextBlock Style="{StaticResource KeyTextBlockStyle}" Text="O" />
+                </DockPanel>
+            </Border>
 
-                        <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Text="Toggle Help" Grid.Column="0" />
-                        <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Text="?" Grid.Column="2" HorizontalAlignment="Center" />
-                    </Grid>
-                </Border>
+            <Border Style="{StaticResource DefaultBorderStyle}" Margin="0,0,0,10" Height="40" DockPanel.Dock="Top">
+                <DockPanel LastChildFill="False">
+                    <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Text="Increase / Decrease Hearts"/>
+                    <TextBlock Style="{StaticResource KeyTextBlockStyle}" Text="&lt;   &gt;" />
+                </DockPanel>
+            </Border>
 
-                <Border Style="{StaticResource DefaultBorderStyle}" Grid.Row="2" Margin="0">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                            <ColumnDefinition Width="50"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Text="Toggle Status Info" Grid.Column="0" />
-                        <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Text="S" Grid.Column="2" HorizontalAlignment="Center" />
-                    </Grid>
-                </Border>
-
-                <Border Style="{StaticResource DefaultBorderStyle}" Grid.Row="4" Margin="0">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                            <ColumnDefinition Width="50"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Text="Open Options" Grid.Column="0" />
-                        <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Text="O" Grid.Column="2" HorizontalAlignment="Center" />
-                    </Grid>
-                </Border>
-
-                <Border Style="{StaticResource DefaultBorderStyle}" Grid.Row="6" Margin="0">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                            <ColumnDefinition Width="50"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Text="Increase / Decrease Hearts" Grid.Column="0" />
-                        <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Text="&lt;   &gt;" Grid.Column="2" HorizontalAlignment="Center" />
-                    </Grid>
-                </Border>
-
-                <Border Style="{StaticResource DefaultBorderStyle}" Grid.Row="8" Margin="0">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                            <ColumnDefinition Width="50"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Text="Increase / Decrease Size" Grid.Column="0" />
-                        <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Text="[   ]" Grid.Column="2" HorizontalAlignment="Center" />
-                    </Grid>
-                </Border>
-
-
-            </Grid>
-        </Border>
-    </Grid>
+            <Border Style="{StaticResource DefaultBorderStyle}"  Height="40" DockPanel.Dock="Top">
+                <DockPanel LastChildFill="False">
+                    <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Text="Increase / Decrease Size"/>
+                    <TextBlock Style="{StaticResource KeyTextBlockStyle}" Text="[   ]" />
+                </DockPanel>
+            </Border>
+        </DockPanel>
+    </Border>
 </Canvas>

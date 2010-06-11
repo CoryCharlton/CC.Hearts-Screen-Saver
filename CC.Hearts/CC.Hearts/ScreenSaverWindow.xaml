@@ -1,23 +1,13 @@
 ﻿<Window x:Class="CC.Hearts.ScreenSaverWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:Controls="clr-namespace:CC.Hearts.Controls" Title="CC.Hearts Screen Saver" Height="600" Width="600" Background="Black" WindowStyle="None" WindowStartupLocation="Manual" Visibility="Visible" ShowInTaskbar="False" ShowActivated="True" WindowState="Normal" ResizeMode="NoResize" Topmost="True" Icon="{StaticResource HeartImage}" Loaded="Window_Loaded">
-    <Grid Name="_GridMain">
-        <Grid.RowDefinitions>
-            <RowDefinition Name="_RowMain" Height="*" ></RowDefinition>
-            <RowDefinition Name="_RowStatus" Height="22" ></RowDefinition>
-        </Grid.RowDefinitions>
-        
-        <Controls:HeartsCanvas x:Name="_HeartsCanvas" ></Controls:HeartsCanvas>
-        <Controls:HelpCanvas x:Name="_HelpCanvas" HorizontalAlignment="Center" VerticalAlignment="Center"></Controls:HelpCanvas>
-        
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="90*"></ColumnDefinition>
-                <ColumnDefinition Width="90"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-                
-            <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Foreground="#8BFFFFFF" Name="_TextBlockFramesPerSecond" Text="100.00 FPS" Grid.Column="0" />
-            <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Foreground="#8BFFFFFF" Name="_TextBlockHeartCount" Text="15% (30/30)" Grid.Column="1" HorizontalAlignment="Right" />
-        </Grid>
-    </Grid>
+
+    <DockPanel Name="LayoutRoot">
+        <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Name="_TextBlockStatus" DockPanel.Dock="Bottom" Foreground="#8BFFFFFF" Text="100.00 FPS - 15% - 30/30" HorizontalAlignment="Center" TextAlignment="Center" Width="175" VerticalAlignment="Bottom">
+            <TextBlock.CacheMode>
+                <BitmapCache EnableClearType="True" RenderAtScale="1" SnapsToDevicePixels="True"></BitmapCache>
+            </TextBlock.CacheMode>
+        </TextBlock>
+        <Controls:HeartsCanvas x:Name="_HeartsCanvas" DockPanel.Dock="Top"></Controls:HeartsCanvas>
+    </DockPanel>
 </Window>

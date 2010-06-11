@@ -17,6 +17,7 @@ namespace CC.Hearts.Controls
 
         #region Private Fields
         private readonly Queue<HeartShape> _Hearts = new Queue<HeartShape>();
+        private HelpPopup _HelpPopup;
         private readonly DispatcherTimer _Timer;
         #endregion
 
@@ -35,6 +36,12 @@ namespace CC.Hearts.Controls
             ResetHeart(newHeart, minHeight, maxHeight, minWidth, maxWidth);
 
             return newHeart;
+        }
+
+        private void CreatePopup()
+        {
+            _HelpPopup = new HelpPopup();
+            _HelpPopup.PlacementTarget = this;
         }
 
         private void ResetHeart(HeartShape heart, int minHeight, int maxHeight, int minWidth, int maxWidth)
@@ -68,10 +75,6 @@ namespace CC.Hearts.Controls
                             Children.RemoveAt(i);
                             Settings.Instance.DecreaseHeartCount();
                         }
-                    }
-                    else
-                    {
-                        Children.RemoveAt(i);
                     }
                 }
 
@@ -118,6 +121,31 @@ namespace CC.Hearts.Controls
         #endregion
 
         #region Public Methods
+        public void ShowHelp(bool? showHelp)
+        {
+            //if (!Children.Contains(_HelpPopup))
+            //{
+            //    Children.Add(_HelpPopup);
+            //}
+
+            if (_HelpPopup == null)
+            {
+                CreatePopup();
+            }
+
+            if (_HelpPopup != null)
+            {
+                if (showHelp == null)
+                {
+                    _HelpPopup.IsOpen = !_HelpPopup.IsOpen;
+                }
+                else
+                {
+                    _HelpPopup.IsOpen = showHelp.GetValueOrDefault(false);
+                }
+            }
+        }
+
         public void Start()
         {
             _Timer.Start();

@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using CC.Hearts.Controls;
 using Application = System.Windows.Application;
 using Binding = System.Windows.Data.Binding;
 using Cursors=System.Windows.Input.Cursors;
@@ -24,7 +25,12 @@ namespace CC.Hearts
         {
             InitializeComponent();
 
-            _RowStatus.Height = new GridLength(0);
+            //_HelpCanvas = new HelpCanvas()
+            //                  {
+            //                      HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+            //                      VerticalAlignment = VerticalAlignment.Center
+            //                  };
+            //_RowStatus.Height = new GridLength(0); // TODO: Look here...
         }
 
         public ScreenSaverWindow(bool primaryScreen): this()
@@ -42,12 +48,13 @@ namespace CC.Hearts
         #endregion
 
         #region Private Fields
-        private Point _FirstMousePosition;
         private int _FrameCount;
         private readonly List<double> _FrameHistory = new List<double>();
         private DateTime _FrameReset;
+        //private readonly HelpCanvas _HelpCanvas;
         private readonly bool _IsPrimary;
         private bool _IsStatusVisible;
+        private Point _MousePosition;
         #endregion
 
         #region Public Properties
@@ -100,15 +107,12 @@ namespace CC.Hearts
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (Settings.Instance.ShowHelp)
-            {
-                ShowHelp(true);
-            }
+            //_HeartsCanvas.ShowHelp(_IsPrimary && !Settings.IsPreview && Settings.Instance.ShowHelp);
         }
         #endregion
 
         #region Private Methods
-        private static void CreateSecondaryScreenSavers()
+        private void CreateSecondaryScreenSavers()
         {
             if (Screen.AllScreens.Length > 1)
             {
@@ -126,6 +130,7 @@ namespace CC.Hearts
                                                                               };
 
                         secondaryScreenSaver.Show();
+                        secondaryScreenSaver.Owner = this;
                         secondaryScreenSaver.WindowState = WindowState.Maximized;
                     }
                 }
@@ -134,47 +139,45 @@ namespace CC.Hearts
 
         private void EnableStatus(bool enable)
         {
-            if (enable && !_IsStatusVisible)
+            if (enable && !_TextBlockStatus.IsVisible)
             {
-                MultiBinding multiBinding = new MultiBinding();
+                MultiBinding multiBinding = new MultiBinding {Mode = BindingMode.OneWay};
                 multiBinding.Bindings.Add(new Binding
-                                      {
-                                          Path = new PropertyPath(Settings.HeartCountProperty),
-                                          Source = Settings.Instance
-                                      });
-
-                multiBinding.Bindings.Add(new Binding
-                                      {
-                                          Path = new PropertyPath(Settings.MaximumHeartsProperty),
-                                          Source = Settings.Instance
-                                      });
+                                              {
+                                                  Mode = BindingMode.OneWay,
+                                                  Path = new PropertyPath(FramesPerSecondProperty),
+                                                  Source = this
+                                              });
                 multiBinding.Bindings.Add(new Binding
                                               {
                                                   Path = new PropertyPath(Settings.ScaleProperty),
                                                   Source = Settings.Instance
                                               });
-                multiBinding.StringFormat = "{2}% ({0}/{1})";
-                BindingOperations.SetBinding(_TextBlockHeartCount, TextBlock.TextProperty, multiBinding);
-                BindingOperations.SetBinding(_TextBlockFramesPerSecond, TextBlock.TextProperty, new Binding
-                                                                                                    {
-                                                                                                        Path = new PropertyPath(FramesPerSecondProperty), 
-                                                                                                        StringFormat = "{0:N} FPS", 
-                                                                                                        Source = this
-                                                                                                    });
+                multiBinding.Bindings.Add(new Binding
+                                              {
+                                                  Path = new PropertyPath(Settings.HeartCountProperty),
+                                                  Source = Settings.Instance
+                                              });
+                multiBinding.Bindings.Add(new Binding
+                                              {
+                                                  Path = new PropertyPath(Settings.MaximumHeartsProperty),
+                                                  Source = Settings.Instance
+                                              });
+                multiBinding.StringFormat = "{0:N} FPS - {1}% - {2}/{3}";
+                
+                BindingOperations.SetBinding(_TextBlockStatus, TextBlock.TextProperty, multiBinding);
                 CompositionTarget.Rendering += CompositionTargetRendering;
+
                 _FrameCount = 0;
                 _FrameHistory.Clear();
                 _FrameReset = DateTime.MinValue;
-                _RowStatus.Height = new GridLength(22);
-                _IsStatusVisible = true;
+                _TextBlockStatus.Visibility = Visibility.Visible;
             }
             else if (!enable)
             {
-                BindingOperations.ClearBinding(_TextBlockFramesPerSecond, TextBlock.TextProperty);
-                BindingOperations.ClearBinding(_TextBlockHeartCount, TextBlock.TextProperty);
+                BindingOperations.ClearBinding(_TextBlockStatus, TextBlock.TextProperty);
                 CompositionTarget.Rendering -= CompositionTargetRendering;
-                _RowStatus.Height = new GridLength(0);
-                _IsStatusVisible = false;
+                _TextBlockStatus.Visibility = Visibility.Hidden;
             }
         }
 
@@ -198,6 +201,8 @@ namespace CC.Hearts
                     Show();
                     WindowState = WindowState.Maximized;
 
+                    _HeartsCanvas.ShowHelp(Settings.Instance.ShowHelp);
+                    
                     CreateSecondaryScreenSavers();
                 }
             }
@@ -207,81 +212,88 @@ namespace CC.Hearts
             }
         }
 
-        private void ShowHelp(bool show)
-        {
-            if (show)
-            {
-                _HelpCanvas.Show(30);
-            }
-            else
-            {
-                _HelpCanvas.Hide();
-            }
-        }
-
         private void ShowOptions()
         {
-            ShowHelp(false);
-            OptionsWindow optionsWindow = new OptionsWindow { Opacity = 0.85, ShowInTaskbar = false, Topmost = Topmost };
+            _HeartsCanvas.ShowHelp(false);
+            OptionsWindow optionsWindow = new OptionsWindow { ShowInTaskbar = false, Topmost = Topmost };
             optionsWindow.ShowDialog();
-            _FirstMousePosition = Mouse.GetPosition(this);
+
+            _MousePosition = Mouse.GetPosition(this);
+
+            foreach (ScreenSaverWindow screenSaverWindow in OwnedWindows.OfType<ScreenSaverWindow>())
+            {
+                screenSaverWindow._MousePosition = Mouse.GetPosition(screenSaverWindow);
+            }
         }
         #endregion
 
         #region Protected Methods
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            if (!Settings.IsPreview)
+            ScreenSaverWindow screenSaverWindow;
+            if (!_IsPrimary && Owner != null && (screenSaverWindow = Owner as ScreenSaverWindow) != null)
             {
-                switch (e.Key)
+                screenSaverWindow.OnKeyDown(e);
+            }
+            else
+            {
+                if (!Settings.IsPreview)
                 {
-                    case Key.OemQuestion:
-                        {
-                            ShowHelp(_HelpCanvas.Opacity <= 0);
-                            break;
-                        }
-                    case Key.OemComma:
-                        {
-                            EnableStatus(true);
-                            Settings.Instance.MaximumHearts -= 1;
-                            break;                            
-                        }
-                    case Key.OemCloseBrackets:
-                        {
-                            EnableStatus(true);
-                            Settings.Instance.Scale += 1;
-                            break;
-                        }
-                    case Key.OemOpenBrackets:
-                        {
-                            EnableStatus(true);
-                            Settings.Instance.Scale -= 1;
-                            break;                                                        
-                        }
-                    case Key.OemPeriod:
-                        {
-                            EnableStatus(true);
-                            Settings.Instance.MaximumHearts += 1;
-                            break;
-                        }
-                    case Key.O:
-                        {
-                            ShowOptions();
-                            break;
-                        }
-                    case Key.S:
-                        {
-                            Settings.Instance.ShowStatus = !Settings.Instance.ShowStatus;
-                            break;
-                        }
-                    default:
-                        {
-                            if (!Settings.IsDebug || e.Key == Key.Escape)
+                    switch (e.Key)
+                    {
+                        case Key.LeftShift:
+                        case Key.RightShift:
                             {
-                                Application.Current.Shutdown();
+                                break;
                             }
-                            break;
-                        }
+                        case Key.OemQuestion: 
+                            {
+                                _HeartsCanvas.ShowHelp(null);
+                                break;
+                            }
+                        case Key.OemComma:
+                            {
+                                EnableStatus(true);
+                                Settings.Instance.MaximumHearts -= 1;
+                                break;
+                            }
+                        case Key.OemCloseBrackets:
+                            {
+                                EnableStatus(true);
+                                Settings.Instance.Scale += 1;
+                                break;
+                            }
+                        case Key.OemOpenBrackets:
+                            {
+                                EnableStatus(true);
+                                Settings.Instance.Scale -= 1;
+                                break;
+                            }
+                        case Key.OemPeriod:
+                            {
+                                EnableStatus(true);
+                                Settings.Instance.MaximumHearts += 1;
+                                break;
+                            }
+                        case Key.O:
+                            {
+                                ShowOptions();
+                                break;
+                            }
+                        case Key.S:
+                            {
+                                Settings.Instance.ShowStatus = !Settings.Instance.ShowStatus;
+                                break;
+                            }
+                        default:
+                            {
+                                if (!Settings.IsDebug || e.Key == Key.Escape)
+                                {
+                                    Application.Current.Shutdown();
+                                }
+                                break;
+                            }
+                    }
                 }
             }
 
@@ -294,12 +306,12 @@ namespace CC.Hearts
             {
                 Point currentPosition = e.GetPosition(this);
 
-                if (_FirstMousePosition.X <= 0 && _FirstMousePosition.Y <= 0)
+                if (_MousePosition.X <= 0 && _MousePosition.Y <= 0)
                 {
-                    _FirstMousePosition = currentPosition;
+                    _MousePosition = currentPosition;
                 }
 
-                if (Point.Subtract(_FirstMousePosition, currentPosition).Length > 30)
+                if (Point.Subtract(_MousePosition, currentPosition).Length > 30)
                 {
                     Application.Current.Shutdown();
                 }

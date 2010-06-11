@@ -12,6 +12,10 @@
         </Style>
     </Window.Resources>
     
+    <Window.CacheMode>
+        <BitmapCache EnableClearType="True" RenderAtScale="1" SnapsToDevicePixels="True"></BitmapCache>
+    </Window.CacheMode>
+    
     <Grid Name="_GridMain" Opacity="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=Opacity}">
         <!-- NOTE: Not so sure about the cache here... -->
         <Grid.CacheMode>

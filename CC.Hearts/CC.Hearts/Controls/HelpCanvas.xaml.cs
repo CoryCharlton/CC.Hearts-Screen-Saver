@@ -23,48 +23,7 @@ namespace CC.Hearts.Controls
         public HelpCanvas()
         {
             InitializeComponent();
-            SetupAnimation();
-            CacheMode = new BitmapCache(2);
-        }
-
-        private int _ShowSeconds = 60;
-        private Duration _ShowDuration;
-        private DoubleAnimation _OpacityAnimation;
-
-        private void SetupAnimation()
-        {
-            _ShowDuration = new Duration(TimeSpan.FromSeconds(_ShowSeconds));
-
-            if (_OpacityAnimation == null)
-            {
-                _OpacityAnimation = new DoubleAnimation(0, _ShowDuration) { AutoReverse = false };
-            }
-            else
-            {
-                _OpacityAnimation.Duration = _ShowDuration;
-            }
-        }
-
-        public void Hide()
-        {
-            BeginAnimation(OpacityProperty, null);
-            Opacity = 0;
-            Visibility = Visibility.Collapsed;
-        }
-
-        public void Show(int seconds)
-        {
-            if (_ShowSeconds != seconds)
-            {
-                _ShowSeconds = seconds;
-
-                SetupAnimation();
-            }
-
-            BeginAnimation(OpacityProperty, null);
-            Opacity = 0.9;
-            Visibility = Visibility.Visible;
-            BeginAnimation(OpacityProperty, _OpacityAnimation, HandoffBehavior.SnapshotAndReplace);
+            //CacheMode = new BitmapCache(2);
         }
     }
 }
