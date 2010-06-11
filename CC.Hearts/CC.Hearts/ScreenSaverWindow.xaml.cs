@@ -186,7 +186,10 @@ namespace CC.Hearts
                     Show();
                     WindowState = WindowState.Maximized;
 
-                    _HeartsCanvas.ShowHelp(Settings.Instance.ShowHelp);
+                    if (Settings.Instance.ShowHelp)
+                    {
+                        _HeartsCanvas.ShowHelp(15);
+                    }
                     
                     CreateSecondaryScreenSavers();
                 }
@@ -199,7 +202,8 @@ namespace CC.Hearts
 
         private void ShowOptions()
         {
-            _HeartsCanvas.ShowHelp(false);
+            _HeartsCanvas.HideHelp();
+
             OptionsWindow optionsWindow = new OptionsWindow { ShowInTaskbar = false, Topmost = Topmost };
             optionsWindow.ShowDialog();
 
@@ -233,7 +237,14 @@ namespace CC.Hearts
                             }
                         case Key.OemQuestion: 
                             {
-                                _HeartsCanvas.ShowHelp(null);
+                                if (_HeartsCanvas.IsHelpOpen)
+                                {
+                                    _HeartsCanvas.HideHelp();
+                                }
+                                else
+                                {
+                                    _HeartsCanvas.ShowHelp();
+                                }
                                 break;
                             }
                         case Key.OemComma:

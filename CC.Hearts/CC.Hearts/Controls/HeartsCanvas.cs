@@ -21,6 +21,23 @@ namespace CC.Hearts.Controls
         private readonly DispatcherTimer _Timer;
         #endregion
 
+        #region Public Properties
+        public bool IsHelpOpen
+        {
+            get
+            {
+                bool returnValue = false;
+
+                if (_HelpPopup != null)
+                {
+                    returnValue = _HelpPopup.IsOpen;
+                }
+
+                return returnValue;
+            }
+        }
+        #endregion
+
         #region Private Methods
         private HeartShape CreateHeart(int minHeight, int maxHeight, int minWidth, int maxWidth)
         {
@@ -120,7 +137,20 @@ namespace CC.Hearts.Controls
         #endregion
 
         #region Public Methods
-        public void ShowHelp(bool? showHelp)
+        public void HideHelp()
+        {
+            if (_HelpPopup != null)
+            {
+                _HelpPopup.Hide();
+            }
+        }
+
+        public void ShowHelp()
+        {
+            ShowHelp(0);
+        }
+            
+        public void ShowHelp(int closeSeconds)
         {
             //if (!Children.Contains(_HelpPopup))
             //{
@@ -134,14 +164,7 @@ namespace CC.Hearts.Controls
 
             if (_HelpPopup != null)
             {
-                if (showHelp == null)
-                {
-                    _HelpPopup.IsOpen = !_HelpPopup.IsOpen;
-                }
-                else
-                {
-                    _HelpPopup.IsOpen = showHelp.GetValueOrDefault(false);
-                }
+                _HelpPopup.Show(closeSeconds);
             }
         }
 
