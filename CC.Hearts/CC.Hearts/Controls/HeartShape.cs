@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define USETRANSLATION //NOTE: Comment/uncomment this line to play with animation on a TranslateTransform VS Canvas.Left/Top. So far the canvas animation seems to use less resources
+
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -37,6 +39,10 @@ namespace CC.Hearts.Controls
         private ScaleTransform _Scale;
         private TransformGroup _TransformGroup;
         private readonly VisualCollection _VisualCollection;
+
+#if USETRANSLATION
+        private TranslateTransform _Translation;
+#endif
         #endregion
 
         #region Protected Properties
@@ -124,16 +130,20 @@ namespace CC.Hearts.Controls
             _TransformGroup = new TransformGroup();
             _Rotation = new RotateTransform(0, HeartVisual.DefaultWidth / 2.0, HeartVisual.DefaultHeight / 2.0);
             _Scale = new ScaleTransform(Width / HeartVisual.DefaultWidth, Height / HeartVisual.DefaultHeight);
-
+#if USETRANSLATION
+            _Translation = new TranslateTransform(0, 0);
+#endif
             _TransformGroup.Children.Add(_Rotation);
             _TransformGroup.Children.Add(_Scale);
-
+#if USETRANSLATION
+            _TransformGroup.Children.Add(_Translation);
+#endif
             RenderTransform = _TransformGroup;
         }
 
         private void SetDefaultValues()
         {
-            CacheMode = new BitmapCache() {EnableClearType = true, SnapsToDevicePixels = true};
+            CacheMode = new BitmapCache(1) {EnableClearType = true, SnapsToDevicePixels = true};
             Gravity = Utilities.RandomNext((int)MinimumGravity, (int)(MaximumGravity + 1));
             Height = HeartVisual.DefaultHeight;
             Width = HeartVisual.DefaultWidth;
@@ -222,7 +232,11 @@ namespace CC.Hearts.Controls
                                                    RepeatBehavior = RepeatBehavior.Forever
                                                };
 
+#if USETRANSLATION
+            _Translation.BeginAnimation(TranslateTransform.YProperty, topAnimation);
+#else
             BeginAnimation(Canvas.TopProperty, topAnimation);
+#endif
 
             DoubleAnimation leftAnimation = new DoubleAnimation
                                                 {
@@ -235,7 +249,11 @@ namespace CC.Hearts.Controls
                                                     RepeatBehavior = RepeatBehavior.Forever
                                                 };
 
+#if USETRANSLATION
+            _Translation.BeginAnimation(TranslateTransform.XProperty, leftAnimation);
+#else
             BeginAnimation(Canvas.LeftProperty, leftAnimation);
+#endif
 
             DoubleAnimation opacityAnimation = new DoubleAnimation
                                                    {
@@ -253,8 +271,13 @@ namespace CC.Hearts.Controls
         public void Stop()
         {
             _Rotation.BeginAnimation(RotateTransform.AngleProperty, null);
-            BeginAnimation(Canvas.TopProperty, null);
+#if USETRANSLATION
+            _Translation.BeginAnimation(TranslateTransform.XProperty, null);
+            _Translation.BeginAnimation(TranslateTransform.YProperty, null);
+#else
             BeginAnimation(Canvas.LeftProperty, null);
+            BeginAnimation(Canvas.TopProperty, null);
+#endif
             BeginAnimation(OpacityProperty, null);
         }
         #endregion

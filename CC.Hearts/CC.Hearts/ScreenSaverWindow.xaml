@@ -1,6 +1,6 @@
 ﻿<Window x:Class="CC.Hearts.ScreenSaverWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:Controls="clr-namespace:CC.Hearts.Controls" Title="CC.Hearts Screen Saver" Height="600" Width="600" Background="Black" WindowStyle="None" WindowStartupLocation="Manual" Visibility="Visible" ShowInTaskbar="False" ShowActivated="True" WindowState="Normal" ResizeMode="NoResize" Topmost="True" Icon="{StaticResource HeartImage}" Loaded="Window_Loaded">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:Controls="clr-namespace:CC.Hearts.Controls" Title="CC.Hearts Screen Saver" Height="600" Width="600" Background="Black" WindowStyle="None" WindowStartupLocation="Manual" Visibility="Visible" ShowInTaskbar="False" ShowActivated="True" WindowState="Normal" ResizeMode="NoResize" Topmost="True" Icon="{StaticResource HeartImage}">
 
     <DockPanel Name="LayoutRoot">
         <TextBlock Style="{StaticResource DefaultTextBlockStyle}" Name="_TextBlockStatus" DockPanel.Dock="Bottom" Foreground="#8BFFFFFF" Text="100.00 FPS - 15% - 30/30" HorizontalAlignment="Center" TextAlignment="Center" Width="175" VerticalAlignment="Bottom">

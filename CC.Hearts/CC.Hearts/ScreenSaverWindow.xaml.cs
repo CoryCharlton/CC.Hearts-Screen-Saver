@@ -9,7 +9,6 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using CC.Hearts.Controls;
 using Application = System.Windows.Application;
 using Binding = System.Windows.Data.Binding;
 using Cursors=System.Windows.Input.Cursors;
@@ -24,13 +23,6 @@ namespace CC.Hearts
         public ScreenSaverWindow()
         {
             InitializeComponent();
-
-            //_HelpCanvas = new HelpCanvas()
-            //                  {
-            //                      HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
-            //                      VerticalAlignment = VerticalAlignment.Center
-            //                  };
-            //_RowStatus.Height = new GridLength(0); // TODO: Look here...
         }
 
         public ScreenSaverWindow(bool primaryScreen): this()
@@ -51,9 +43,7 @@ namespace CC.Hearts
         private int _FrameCount;
         private readonly List<double> _FrameHistory = new List<double>();
         private DateTime _FrameReset;
-        //private readonly HelpCanvas _HelpCanvas;
         private readonly bool _IsPrimary;
-        private bool _IsStatusVisible;
         private Point _MousePosition;
         #endregion
 
@@ -103,11 +93,6 @@ namespace CC.Hearts
                         break;
                     }
             }
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            //_HeartsCanvas.ShowHelp(_IsPrimary && !Settings.IsPreview && Settings.Instance.ShowHelp);
         }
         #endregion
 

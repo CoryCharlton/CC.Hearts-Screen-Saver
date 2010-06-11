@@ -40,8 +40,7 @@ namespace CC.Hearts.Controls
 
         private void CreatePopup()
         {
-            _HelpPopup = new HelpPopup();
-            _HelpPopup.PlacementTarget = this;
+            _HelpPopup = new HelpPopup {PlacementTarget = this};
         }
 
         private void ResetHeart(HeartShape heart, int minHeight, int maxHeight, int minWidth, int maxWidth)
