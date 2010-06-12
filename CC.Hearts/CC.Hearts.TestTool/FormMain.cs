@@ -155,7 +155,7 @@ namespace CC.Hearts.TestTool
 
             if (_CheckBoxDebug.Checked)
             {
-                startInfo.Arguments = "/d" + (!string.IsNullOrEmpty(arguments) ? " " + arguments : string.Empty);
+                startInfo.Arguments = "/d true" + (!string.IsNullOrEmpty(arguments) ? " " + arguments : string.Empty);
             }
             else if (!string.IsNullOrEmpty(arguments))
             {

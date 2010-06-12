@@ -129,6 +129,8 @@
     </Compile>
     <Compile Include="Controls\HelpPopup.cs" />
     <Compile Include="Enums.cs" />
+    <Compile Include="Utilities\FramesRateMonitor.cs" />
+    <Compile Include="Utilities\MessageBoxHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -143,7 +145,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Settings.cs" />
-    <Compile Include="Utilities.cs" />
+    <Compile Include="Utilities\CommonFunction.cs" />
     <Compile Include="ScreenSaverWindow.xaml.cs">
       <DependentUpon>ScreenSaverWindow.xaml</DependentUpon>
     </Compile>

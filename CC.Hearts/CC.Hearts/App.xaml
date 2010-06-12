@@ -3,7 +3,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Application.Resources>
         <BitmapImage x:Key="HeartImage" UriSource="/Resources/Heart.ico" />
-        
+
+        <!-- BEGIN: Brushes -->
         <LinearGradientBrush x:Key="BackgroundBrush">
             <GradientStop Color="#FF666666" Offset="0"/>
             <GradientStop Color="#FF333333" Offset="1"/>
@@ -12,34 +13,45 @@
             <GradientStop Color="#FF999999" Offset="0"/>
             <GradientStop Color="#FF666666" Offset="1"/>
         </LinearGradientBrush>
+        <LinearGradientBrush x:Key="ReverseBackgroundBrush">
+            <GradientStop Color="#FF666666" Offset="1"/>
+            <GradientStop Color="#FF333333" Offset="0"/>
+        </LinearGradientBrush>
+        <!-- END: Brushes -->
 
+        <!-- BEGIN: Border Styles -->
         <Style x:Key="DefaultBorderStyle" TargetType="{x:Type Border}">
             <Setter Property="Background" Value="{StaticResource BackgroundBrush}"></Setter>
             <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"></Setter>
-            <Setter Property="BorderThickness" Value="2"></Setter>
+            <Setter Property="BorderThickness" Value="1.5"></Setter>
             <Setter Property="CornerRadius" Value="2"></Setter>
             <Setter Property="Margin" Value="1"></Setter>
         </Style>
-
+        <Style x:Key="RowBorderStyle" TargetType="{x:Type Border}" BasedOn="{StaticResource DefaultBorderStyle}">
+            <Setter Property="BorderThickness" Value="1"></Setter>
+            <Setter Property="DockPanel.Dock" Value="Top" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Margin" Value="0,0,0,10" />
+        </Style>
+        <!-- END: Border Styles -->
+        
+        <!-- BEGIN: CheckBox Styles -->
         <Style x:Key="DefaultCheckBoxStyle" TargetType="{x:Type CheckBox}">
             <Setter Property="FontWeight" Value="Bold"></Setter>
             <Setter Property="Foreground" Value="White"></Setter>
             <Setter Property="Margin" Value="10,2,10,2"></Setter>
             <Setter Property="VerticalAlignment" Value="Center"></Setter>
         </Style>
+        <!-- END: CheckBox Styles -->
 
-        <Style x:Key="DefaultSliderStyle" TargetType="{x:Type Slider}">
-            <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
-            <Setter Property="Margin" Value="10,2,10,2"></Setter>
-            <Setter Property="VerticalAlignment" Value="Center"></Setter>
-        </Style>
-
+        <!-- BEGIN: TextBlock Styles -->
         <Style x:Key="DefaultTextBlockStyle" TargetType="{x:Type TextBlock}">
             <Setter Property="FontWeight" Value="Bold"></Setter>
             <Setter Property="Foreground" Value="White"></Setter>
             <Setter Property="Margin" Value="10,2,10,2"></Setter>
             <Setter Property="VerticalAlignment" Value="Center"></Setter>
         </Style>
+        <!-- END: TextBlock Styles -->
 
         <!-- NOTE: The following license applies to data referenced in the StreamGeometry named "HeartGeometry" below. This data originated from the BabySmash! application by Scott Hanselman, http://babysmash.codeplex.com/
 

@@ -25,46 +25,49 @@ namespace CC.Hearts
         #endregion
 
         #region Dependency Properties
-        public static readonly DependencyProperty FramesPerSecondProperty = DependencyProperty.Register("FramesPerSecond", typeof(int), typeof(Settings), new PropertyMetadata(DEFAULT_FRAMES_PER_SECOND, OnFramesPerSecondChanged));
+        public static readonly DependencyProperty AnimationSpeedProperty = DependencyProperty.Register("AnimationSpeed", typeof(HeartAnimationSpeed), typeof(Settings), new PropertyMetadata(DefaultAnimationSpeed));
+        public static readonly DependencyProperty FramesPerSecondProperty = DependencyProperty.Register("FramesPerSecond", typeof(int), typeof(Settings), new PropertyMetadata(DefaultFramesPerSecond, OnFramesPerSecondChanged));
         public static readonly DependencyProperty HeartCountProperty = DependencyProperty.Register("HeartCount", typeof(int), typeof(Settings), new PropertyMetadata(0));
-        public static readonly DependencyProperty MaximumHeartsProperty = DependencyProperty.Register("MaximumHearts", typeof(int), typeof(Settings), new PropertyMetadata(DEFAULT_MAXIMUM_HEARTS, OnMaximumHeartsChanged));
-        public static readonly DependencyProperty ScaleProperty = DependencyProperty.Register("Scale", typeof(int), typeof(Settings), new PropertyMetadata(DEFAULT_SCALE, OnScaleChanged));
-        public static readonly DependencyProperty ShowHelpProperty = DependencyProperty.Register("ShowHelp", typeof(bool), typeof(Settings), new PropertyMetadata(DEFAULT_SHOW_HELP));
-        public static readonly DependencyProperty ShowStatusProperty = DependencyProperty.Register("ShowStatus", typeof(bool), typeof(Settings), new PropertyMetadata(DEFAULT_SHOW_STATUS));
+        public static readonly DependencyProperty MaximumHeartsProperty = DependencyProperty.Register("MaximumHearts", typeof(int), typeof(Settings), new PropertyMetadata(DefaultMaximumHearts, OnMaximumHeartsChanged));
+        public static readonly DependencyProperty ScaleProperty = DependencyProperty.Register("Scale", typeof(int), typeof(Settings), new PropertyMetadata(DefaultScale, OnScaleChanged));
+        public static readonly DependencyProperty ShowHelpProperty = DependencyProperty.Register("ShowHelp", typeof(bool), typeof(Settings), new PropertyMetadata(DefaultShowHelp));
+        public static readonly DependencyProperty ShowStatusProperty = DependencyProperty.Register("ShowStatus", typeof(bool), typeof(Settings), new PropertyMetadata(DefaultShowStatus));
         #endregion
 
         #region Private Constants
         // ReSharper disable InconsistentNaming
-        #region Default Values
-        private const int DEFAULT_FRAMES_PER_SECOND = 45;
-        private const int DEFAULT_MAXIMUM_HEARTS = 30;
-        private const int DEFAULT_SCALE = 10;
-        private const bool DEFAULT_SHOW_HELP = true;
-        private const bool DEFAULT_SHOW_STATUS = false;
-        #endregion
-
         #region Registry Keys
+        private const string ANIMATION_SPEED = "AnimationSpeed";
         private const string FRAMES_PER_SECOND = "FramesPerSecond";
         private const string MAXIMUM_HEARTS = "MaximumHearts";
         private const string SCALE = "Scale";
         private const string SHOW_HELP = "ShowHelp";
         private const string SHOW_STATUS = "ShowStatus";
 
-        private const string REGISTRY_KEY = @"Software\CC.Hearts Screensaver";
+        private const string REGISTRY_KEY = @"Software\CC.Hearts Screen Saver";
         #endregion
         #endregion
 
         #region Public Constants
+        #region Default Values
+        public const HeartAnimationSpeed DefaultAnimationSpeed = HeartAnimationSpeed.Normal;
+        public const int DefaultFramesPerSecond = 30;
+        public const int DefaultMaximumHearts = 30;
+        public const int DefaultScale = 7;
+        public const bool DefaultShowHelp = true;
+        public const bool DefaultShowStatus = false;
+        #endregion
+
         #region Maximum Values
-        public const int MAXIMUM_FRAMES_PER_SECOND = 60;
-        public const int MAXIMUM_MAXIMUM_HEARTS = 50;
-        public const int MAXIMUM_SCALE = 15;
+        public const int MaximumFramesPerSecond = 60;
+        public const int MaximumMaximumHearts = 50;
+        public const int MaximumScale = 9;
         #endregion
 
         #region Minimum Values
-        public const int MINIMUM_FRAMES_PER_SECOND = 30;
-        public const int MINIMUM_MAXIMUM_HEARTS = 10;
-        public const int MINIMUM_SCALE = 5;
+        public const int MinimumFramesPerSecond = 30;
+        public const int MinimumMaximumHearts = 10;
+        public const int MinimumScale = 5;
         #endregion
         // ReSharper restore InconsistentNaming
         #endregion
@@ -82,6 +85,12 @@ namespace CC.Hearts
         #endregion
 
         #region Public Properties
+        public HeartAnimationSpeed AnimationSpeed
+        {
+            get { return (HeartAnimationSpeed)GetValue(AnimationSpeedProperty); }
+            set { SetValue(AnimationSpeedProperty, value); }
+        }
+
         public int FramesPerSecond
         {
             get { return (int)GetValue(FramesPerSecondProperty); }
@@ -139,26 +148,26 @@ namespace CC.Hearts
         private static void OnFramesPerSecondChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             int value = (int)e.NewValue;
-            if (value > MAXIMUM_FRAMES_PER_SECOND)
+            if (value > MaximumFramesPerSecond)
             {
-                d.SetValue(e.Property, MAXIMUM_FRAMES_PER_SECOND);
+                d.SetValue(e.Property, MaximumFramesPerSecond);
             }
-            else if (value < MINIMUM_FRAMES_PER_SECOND)
+            else if (value < MinimumFramesPerSecond)
             {
-                d.SetValue(e.Property, MINIMUM_FRAMES_PER_SECOND);
+                d.SetValue(e.Property, MinimumFramesPerSecond);
             }
         }
 
         private static void OnMaximumHeartsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             int value = (int)e.NewValue;
-            if (value > MAXIMUM_MAXIMUM_HEARTS)
+            if (value > MaximumMaximumHearts)
             {
-                d.SetValue(e.Property, MAXIMUM_MAXIMUM_HEARTS);
+                d.SetValue(e.Property, MaximumMaximumHearts);
             }
-            else if (value < MINIMUM_MAXIMUM_HEARTS)
+            else if (value < MinimumMaximumHearts)
             {
-                d.SetValue(e.Property, MINIMUM_MAXIMUM_HEARTS);
+                d.SetValue(e.Property, MinimumMaximumHearts);
             }
         }
 
@@ -177,13 +186,13 @@ namespace CC.Hearts
         {
             int value = (int)e.NewValue;
 
-            if (value > MAXIMUM_SCALE)
+            if (value > MaximumScale)
             {
-                d.SetValue(e.Property, MAXIMUM_SCALE);
+                d.SetValue(e.Property, MaximumScale);
             }
-            else if (value < MINIMUM_SCALE)
+            else if (value < MinimumScale)
             {
-                d.SetValue(e.Property, MINIMUM_SCALE);
+                d.SetValue(e.Property, MinimumScale);
             }
         }
 
@@ -212,11 +221,12 @@ namespace CC.Hearts
             {
                 using (RegistryKey registryKey = OpenRegistryKey())
                 {
-                    FramesPerSecond = (int)registryKey.GetValue(FRAMES_PER_SECOND, DEFAULT_FRAMES_PER_SECOND);
-                    MaximumHearts = (int)registryKey.GetValue(MAXIMUM_HEARTS, DEFAULT_MAXIMUM_HEARTS);
-                    Scale = (int)registryKey.GetValue(SCALE, DEFAULT_SCALE);
-                    ShowHelp = bool.Parse(registryKey.GetValue(SHOW_HELP, DEFAULT_SHOW_HELP).ToString());
-                    ShowStatus = bool.Parse(registryKey.GetValue(SHOW_STATUS, DEFAULT_SHOW_STATUS).ToString());
+                    AnimationSpeed = (HeartAnimationSpeed)registryKey.GetValue(ANIMATION_SPEED, DefaultAnimationSpeed);
+                    FramesPerSecond = (int)registryKey.GetValue(FRAMES_PER_SECOND, DefaultFramesPerSecond);
+                    MaximumHearts = (int)registryKey.GetValue(MAXIMUM_HEARTS, DefaultMaximumHearts);
+                    Scale = (int)registryKey.GetValue(SCALE, DefaultScale);
+                    ShowHelp = bool.Parse(registryKey.GetValue(SHOW_HELP, DefaultShowHelp).ToString());
+                    ShowStatus = bool.Parse(registryKey.GetValue(SHOW_STATUS, DefaultShowStatus).ToString());
                 }
 
                 _IsLoaded = true;
@@ -232,11 +242,12 @@ namespace CC.Hearts
 
         public void Reset()
         {
-            FramesPerSecond = DEFAULT_FRAMES_PER_SECOND;
-            MaximumHearts = DEFAULT_MAXIMUM_HEARTS;
-            Scale = DEFAULT_SCALE;
-            ShowHelp = DEFAULT_SHOW_HELP;
-            ShowStatus = DEFAULT_SHOW_STATUS;
+            AnimationSpeed = DefaultAnimationSpeed;
+            FramesPerSecond = DefaultFramesPerSecond;
+            MaximumHearts = DefaultMaximumHearts;
+            Scale = DefaultScale;
+            ShowHelp = DefaultShowHelp;
+            ShowStatus = DefaultShowStatus;
         }
 
         public bool Save()
@@ -247,6 +258,7 @@ namespace CC.Hearts
             {
                 using (RegistryKey registryKey = OpenRegistryKey())
                 {
+                    registryKey.SetValue(ANIMATION_SPEED, (int)AnimationSpeed, RegistryValueKind.DWord);
                     registryKey.SetValue(FRAMES_PER_SECOND, FramesPerSecond, RegistryValueKind.DWord);
                     registryKey.SetValue(MAXIMUM_HEARTS, MaximumHearts, RegistryValueKind.DWord);
                     registryKey.SetValue(SCALE, Scale, RegistryValueKind.DWord);

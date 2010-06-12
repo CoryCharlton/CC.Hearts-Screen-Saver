@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using CC.Hearts.Utilities;
 
 namespace CC.Hearts.Controls
 {
@@ -18,12 +19,27 @@ namespace CC.Hearts.Controls
             SetDefaultValues();
             CreateTransforms();
         }
+
+        public HeartShape(HeartAnimationSpeed animationSpeed) : this()
+        {
+            AnimationSpeed = animationSpeed;
+        }
         #endregion
 
         #region Private Constants
-        public const int BaseMilliseconds = 50;
-        public static readonly TimeSpan BaseTimeSpan = TimeSpan.FromMilliseconds(BaseMilliseconds);
-        public static readonly Duration BaseDuration = new Duration(BaseTimeSpan);
+
+        public const int FastMilliseconds = 50;
+        public const int FastOpacityModifier = 1000;
+        public static readonly Duration FastDuration = new Duration(TimeSpan.FromMilliseconds(FastMilliseconds));
+
+        public const int NormalMilliseconds = 100;
+        public const int NormalOpacityModifier = 950;
+        public static readonly Duration NormalDuration = new Duration(TimeSpan.FromMilliseconds(NormalMilliseconds));
+
+        public const int SlowMilliseconds = 150;
+        public const int SlowOpacityModifier = 900;
+        public static readonly Duration SlowDuration = new Duration(TimeSpan.FromMilliseconds(SlowMilliseconds));
+        
         public const double MaximumGravity = 12.0;
         public const double MaximumRandomAngle = 35;
         public const double MinimumGravity = 6.0;
@@ -31,10 +47,13 @@ namespace CC.Hearts.Controls
         #endregion
 
         #region Private Fields
+        private HeartAnimationSpeed _AnimationSpeed;
+        private Duration _Duration = NormalDuration;
         private double _Gravity;
         private readonly HeartVisual _HeartVisual = new HeartVisual();
         private double _MaximumAngle;
         private double _MinimumAngle;
+        private double _OpacityModifier = NormalOpacityModifier;
         private RotateTransform _Rotation;
         private ScaleTransform _Scale;
         private TransformGroup _TransformGroup;
@@ -57,6 +76,38 @@ namespace CC.Hearts.Controls
         {
             get { return _Rotation.Angle; }
             set { _Rotation.Angle = value; }
+        }
+
+        public HeartAnimationSpeed AnimationSpeed
+        {
+            get { return _AnimationSpeed; }
+            set
+            {
+                _AnimationSpeed = value;
+
+                switch (_AnimationSpeed)
+                {
+                    case HeartAnimationSpeed.Fast:
+                        {
+                            _Duration = FastDuration;
+                            _OpacityModifier = FastOpacityModifier;
+                            break;
+                        }
+                    case HeartAnimationSpeed.Slow:
+                        {
+                            _Duration = SlowDuration;
+                            _OpacityModifier = SlowOpacityModifier;
+                            break;
+                        }
+                    default:
+                        {
+                            _Duration = NormalDuration;
+                            _OpacityModifier = NormalOpacityModifier;
+                            break;
+                        }
+                }
+
+            }
         }
 
         public Brush Fill
@@ -143,8 +194,8 @@ namespace CC.Hearts.Controls
 
         private void SetDefaultValues()
         {
-            CacheMode = new BitmapCache(1) {EnableClearType = true, SnapsToDevicePixels = true};
-            Gravity = Utilities.RandomNext((int)MinimumGravity, (int)(MaximumGravity + 1));
+            CacheMode = new BitmapCache(0.25); // {EnableClearType = true, SnapsToDevicePixels = true}; // NOTE: Most of the time this gets scaled down so rendering the cache smaller seems to produce crisper images
+            Gravity = CommonFunctions.RandomNext((int)MinimumGravity, (int)(MaximumGravity + 1));
             Height = HeartVisual.DefaultHeight;
             Width = HeartVisual.DefaultWidth;
 
@@ -152,8 +203,8 @@ namespace CC.Hearts.Controls
             double gravityFactor = Gravity/MaximumGravity;
 
             MaximumAngle = (randomAngleDelta*gravityFactor) + MinimumRandomAngle;
-            NegativeXVelocity = (Utilities.RandomNext(0, 2) == 1);
-            XVelocityRatio = Utilities.RandomNext(25, 50)/100.0;
+            NegativeXVelocity = (CommonFunctions.RandomNext(0, 2) == 1);
+            XVelocityRatio = CommonFunctions.RandomNext(25, 50) / 100.0;
         }
         #endregion
 
@@ -225,7 +276,7 @@ namespace CC.Hearts.Controls
                                                {
                                                    AutoReverse = false,
                                                    By = Gravity,
-                                                   Duration = BaseDuration,
+                                                   Duration = _Duration,
                                                    From = Opacity,
                                                    IsAdditive = true,
                                                    IsCumulative = true,
@@ -242,7 +293,7 @@ namespace CC.Hearts.Controls
                                                 {
                                                     AutoReverse = false,
                                                     By = NegativeXVelocity ? Gravity*XVelocityRatio*-1 : Gravity*XVelocityRatio,
-                                                    Duration = BaseDuration,
+                                                    Duration = _Duration,
                                                     From = Left,
                                                     IsAdditive = true,
                                                     IsCumulative = true,
@@ -258,8 +309,8 @@ namespace CC.Hearts.Controls
             DoubleAnimation opacityAnimation = new DoubleAnimation
                                                    {
                                                        AutoReverse = false,
-                                                       By = (Gravity/1000)*-1,
-                                                       Duration = BaseDuration,
+                                                       By = (Gravity/_OpacityModifier)*-1,
+                                                       Duration = _Duration,
                                                        From = Opacity,
                                                        IsCumulative = true,
                                                        RepeatBehavior = RepeatBehavior.Forever

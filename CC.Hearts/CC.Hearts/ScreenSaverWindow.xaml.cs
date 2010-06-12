@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Forms;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Animation;
+using CC.Hearts.Controls;
+using CC.Hearts.Utilities;
 using Application = System.Windows.Application;
 using Binding = System.Windows.Data.Binding;
 using Cursors=System.Windows.Input.Cursors;
@@ -29,64 +28,34 @@ namespace CC.Hearts
         {
             _IsPrimary = primaryScreen;
 
+            BindingOperations.SetBinding(_HeartsCanvas, HeartsCanvas.AnimationSpeedProperty, new Binding
+                                                                                                 {
+                                                                                                     Mode = BindingMode.OneWay,
+                                                                                                     Path = new PropertyPath(Settings.AnimationSpeedProperty),
+                                                                                                     Source = Settings.Instance
+                                                                                                 });
             SetupScreenSaver();
             
             _HeartsCanvas.Start();
         }
         #endregion
 
-        #region Dependency Properties
-        public static readonly DependencyProperty FramesPerSecondProperty = DependencyProperty.Register("FramesPerSecond", typeof(double), typeof(ScreenSaverWindow), new PropertyMetadata(0.00));
-        #endregion
-
         #region Private Fields
-        private int _FrameCount;
-        private readonly List<double> _FrameHistory = new List<double>();
-        private DateTime _FrameReset;
+        private FramesRateMonitor _FrameRateMonitor;
         private readonly bool _IsPrimary;
         private Point _MousePosition;
         #endregion
 
-        #region Public Properties
-        public double FramesPerSecond
-        {
-            get { return (double)GetValue(FramesPerSecondProperty); }
-            set { SetValue(FramesPerSecondProperty, value); }
-        }
-        #endregion
-
         #region Private Event Handlers
-        private void CompositionTargetRendering(object sender, EventArgs e)
-        {
-            double totalSeconds = (DateTime.Now - _FrameReset).TotalSeconds;
-            if (totalSeconds > 1)
-            {
-                double framesPerSecond = (_FrameCount / totalSeconds);
-                _FrameHistory.Add(framesPerSecond);
-
-                while (_FrameHistory.Count > 180)
-                {
-                    _FrameHistory.RemoveAt(0);
-                }
-
-                // ReSharper disable RedundantAssignment
-                FramesPerSecond = _FrameHistory.Aggregate((totalValue, nextValue) => totalValue += nextValue) / _FrameHistory.Count;
-                //_TextBlockHeartCount.Text = "(" + Settings.HeartCount + "/" + Settings.MaximumHearts + ")";
-
-                _FrameCount = 0;
-                _FrameReset = DateTime.Now;
-            }
-            else
-            {
-                _FrameCount++;
-            }
-
-        }
-
         private void SettingsPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
+                case "FramesPerSecond":
+                    {
+                        MessageBoxHelper.Show("Some of your settings will not take effect until you restart.", MessageBoxImage.Information);
+                        break;
+                    }
                 case "ShowStatus":
                     {
                         EnableStatus(Settings.Instance.ShowStatus);
@@ -126,12 +95,17 @@ namespace CC.Hearts
         {
             if (enable && !_TextBlockStatus.IsVisible)
             {
+                if (_FrameRateMonitor == null)
+                {
+                    _FrameRateMonitor = new FramesRateMonitor(15);    
+                }
+
                 MultiBinding multiBinding = new MultiBinding {Mode = BindingMode.OneWay};
                 multiBinding.Bindings.Add(new Binding
                                               {
                                                   Mode = BindingMode.OneWay,
-                                                  Path = new PropertyPath(FramesPerSecondProperty),
-                                                  Source = this
+                                                  Path = new PropertyPath(FramesRateMonitor.FramesPerSecondProperty),
+                                                  Source = _FrameRateMonitor
                                               });
                 multiBinding.Bindings.Add(new Binding
                                               {
@@ -148,20 +122,27 @@ namespace CC.Hearts
                                                   Path = new PropertyPath(Settings.MaximumHeartsProperty),
                                                   Source = Settings.Instance
                                               });
-                multiBinding.StringFormat = "{0:N} FPS - {1}% - {2}/{3}";
+                multiBinding.Bindings.Add(new Binding
+                                              {
+                                                  Path = new PropertyPath(Settings.AnimationSpeedProperty),
+                                                  Source = Settings.Instance
+                                              });
+                multiBinding.StringFormat = Settings.IsPreview ? "{0:N} FPS - {1}% - {2}/{3} - {4:D}" : "{0:N} FPS - {1}% - {2}/{3} - {4}";
                 
                 BindingOperations.SetBinding(_TextBlockStatus, TextBlock.TextProperty, multiBinding);
-                CompositionTarget.Rendering += CompositionTargetRendering;
 
-                _FrameCount = 0;
-                _FrameHistory.Clear();
-                _FrameReset = DateTime.MinValue;
+                _FrameRateMonitor.Start();
                 _TextBlockStatus.Visibility = Visibility.Visible;
             }
             else if (!enable)
             {
                 BindingOperations.ClearBinding(_TextBlockStatus, TextBlock.TextProperty);
-                CompositionTarget.Rendering -= CompositionTargetRendering;
+             
+                if (_FrameRateMonitor != null)
+                {
+                    _FrameRateMonitor.Stop();
+                }
+
                 _TextBlockStatus.Visibility = Visibility.Hidden;
             }
         }
@@ -230,29 +211,59 @@ namespace CC.Hearts
                 {
                     switch (e.Key)
                     {
-                        case Key.LeftShift:
-                        case Key.RightShift:
+                        #region Animation Speed
+                        case Key.OemPlus:
                             {
+                                switch (Settings.Instance.AnimationSpeed)
+                                {
+                                    case HeartAnimationSpeed.Normal:
+                                        {
+                                            Settings.Instance.AnimationSpeed = HeartAnimationSpeed.Fast;
+                                            break;
+                                        }
+                                    case HeartAnimationSpeed.Slow:
+                                        {
+                                            Settings.Instance.AnimationSpeed = HeartAnimationSpeed.Normal;
+                                            break;
+                                        }
+                                }
                                 break;
                             }
-                        case Key.OemQuestion: 
+                        case Key.OemMinus:
                             {
-                                if (_HeartsCanvas.IsHelpOpen)
+                                switch (Settings.Instance.AnimationSpeed)
                                 {
-                                    _HeartsCanvas.HideHelp();
+                                    case HeartAnimationSpeed.Fast:
+                                        {
+                                            Settings.Instance.AnimationSpeed = HeartAnimationSpeed.Normal;
+                                            break;
+                                        }
+                                    case HeartAnimationSpeed.Normal:
+                                        {
+                                            Settings.Instance.AnimationSpeed = HeartAnimationSpeed.Slow;
+                                            break;
+                                        }
                                 }
-                                else
-                                {
-                                    _HeartsCanvas.ShowHelp();
-                                }
+                                break;
+                            }
+                        #endregion
+
+                        #region Heart Count
+                        case Key.OemPeriod:
+                            {
+                                EnableStatus(true);
+                                Settings.Instance.MaximumHearts += 5;
                                 break;
                             }
                         case Key.OemComma:
                             {
                                 EnableStatus(true);
-                                Settings.Instance.MaximumHearts -= 1;
+                                Settings.Instance.MaximumHearts -= 5;
                                 break;
                             }
+                        #endregion
+
+                        #region Heart Size
                         case Key.OemCloseBrackets:
                             {
                                 EnableStatus(true);
@@ -265,22 +276,47 @@ namespace CC.Hearts
                                 Settings.Instance.Scale -= 1;
                                 break;
                             }
-                        case Key.OemPeriod:
-                            {
-                                EnableStatus(true);
-                                Settings.Instance.MaximumHearts += 1;
-                                break;
-                            }
+                        #endregion
+
+                        #region Options
                         case Key.O:
                             {
                                 ShowOptions();
                                 break;
                             }
+                        #endregion
+
+                        #region Toggle Help
+                        case Key.OemQuestion:
+                            {
+                                if (_HeartsCanvas.IsHelpOpen)
+                                {
+                                    _HeartsCanvas.HideHelp();
+                                }
+                                else
+                                {
+                                    _HeartsCanvas.ShowHelp();
+                                }
+                                break;
+                            }
+                        #endregion
+
+                        #region Toggle Status
                         case Key.S:
                             {
                                 Settings.Instance.ShowStatus = !Settings.Instance.ShowStatus;
                                 break;
                             }
+                        #endregion
+
+                        #region * Ignored Keys *
+                        case Key.LeftShift:
+                        case Key.RightShift:
+                            {
+                                break;
+                            }
+                        #endregion
+
                         default:
                             {
                                 if (!Settings.IsDebug || e.Key == Key.Escape)

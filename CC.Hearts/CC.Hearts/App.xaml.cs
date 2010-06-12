@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -18,19 +19,22 @@ namespace CC.Hearts
         protected override void OnStartup(StartupEventArgs e)
         {
             //base.OnStartup(e);
-
 #if DEBUG
             Settings.IsDebug = true;
 #endif
             Settings.Tier = (RenderCapability.Tier >> 16);
 
-            ArgumentParser argumentParser = new ArgumentParser(new[] { "/", "-" }, true, new[] { new Argument("c", ArgumentValue.Optional, true), new Argument("d", ArgumentValue.None, true), new Argument("p", ArgumentValue.Required, true), new Argument("s", ArgumentValue.None, true) });
+            ArgumentParser argumentParser = new ArgumentParser(new[] { "/", "-" }, true, new[] { new Argument("c", ArgumentValue.Optional, true), new Argument("d", ArgumentValue.Optional, true), new Argument("p", ArgumentValue.Required, true), new Argument("s", ArgumentValue.None, true) });
             argumentParser.Parse(e.Args);
             ArgumentDictionary validArguments = argumentParser.ParsedArguments.GetValidArguments();
 
             if (validArguments.Contains("d"))
             {
-                //Debugger.Launch(); // NOTE: The only time I use /d is when I want to profile a Release build so launching the debugger is pointless
+                if (validArguments["d"].Value.Equals("true", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    Debugger.Launch();
+                }
+
                 Settings.IsDebug = true;
             }
 
